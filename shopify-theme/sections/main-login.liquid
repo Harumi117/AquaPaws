@@ -1,0 +1,95 @@
+<section class="account-page section-padding">
+  <div class="container">
+    <div class="account-form-wrap">
+      <div class="account-tabs">
+        <button class="account-tab account-tab--active" data-target="login">ログイン</button>
+        <button class="account-tab" data-target="register">新規会員登録</button>
+      </div>
+
+      <!-- ログイン -->
+      <div class="account-panel" id="panel-login">
+        <h1 class="account-panel__title">ログイン</h1>
+        {%- form 'customer_login' -%}
+          {%- if form.errors -%}
+            <div class="form-error">
+              {{ form.errors | default_errors }}
+            </div>
+          {%- endif -%}
+          <div class="form-group">
+            <label for="login-email" class="form-label">メールアドレス</label>
+            <input type="email" id="login-email" name="customer[email]" class="form-input"
+                   autocomplete="email" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password" class="form-label">
+              パスワード
+              <a href="/account/forgot_password" class="form-label__link">パスワードを忘れた方</a>
+            </label>
+            <input type="password" id="login-password" name="customer[password]" class="form-input"
+                   autocomplete="current-password" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full btn--large">ログイン</button>
+        {%- endform -%}
+      </div>
+
+      <!-- 新規登録 -->
+      <div class="account-panel account-panel--hidden" id="panel-register">
+        <h1 class="account-panel__title">新規会員登録</h1>
+        {%- form 'create_customer' -%}
+          {%- if form.errors -%}
+            <div class="form-error">
+              {{ form.errors | default_errors }}
+            </div>
+          {%- endif -%}
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reg-lastname" class="form-label">姓</label>
+              <input type="text" id="reg-lastname" name="customer[last_name]" class="form-input"
+                     autocomplete="family-name" required>
+            </div>
+            <div class="form-group">
+              <label for="reg-firstname" class="form-label">名</label>
+              <input type="text" id="reg-firstname" name="customer[first_name]" class="form-input"
+                     autocomplete="given-name" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reg-email" class="form-label">メールアドレス</label>
+            <input type="email" id="reg-email" name="customer[email]" class="form-input"
+                   autocomplete="email" required>
+          </div>
+          <div class="form-group">
+            <label for="reg-password" class="form-label">パスワード（8文字以上）</label>
+            <input type="password" id="reg-password" name="customer[password]" class="form-input"
+                   autocomplete="new-password" minlength="8" required>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full btn--large">会員登録する</button>
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  const tabs = document.querySelectorAll('.account-tab');
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      tabs.forEach(function (t) { t.classList.remove('account-tab--active'); });
+      tab.classList.add('account-tab--active');
+      document.querySelectorAll('.account-panel').forEach(function (p) {
+        p.classList.add('account-panel--hidden');
+      });
+      const target = document.getElementById('panel-' + tab.dataset.target);
+      if (target) target.classList.remove('account-panel--hidden');
+    });
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "ログイン・登録",
+  "settings": []
+}
+{% endschema %}

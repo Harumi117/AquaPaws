@@ -1,0 +1,134 @@
+<section class="cart-page section-padding">
+  <div class="container">
+    <h1 class="cart-page__title">カート</h1>
+
+    {%- if cart.item_count > 0 -%}
+      <div class="cart-page__layout">
+        <div class="cart-items">
+          <div class="cart-items__header">
+            <span>商品</span>
+            <span>価格</span>
+            <span>数量</span>
+            <span>合計</span>
+          </div>
+
+          {%- for item in cart.items -%}
+            <div class="cart-item" data-key="{{ item.key }}">
+              <div class="cart-item__image">
+                {%- if item.image -%}
+                  <a href="{{ item.url }}">
+                    <img src="{{ item.image | image_url: width: 120 }}"
+                         alt="{{ item.image.alt | escape }}"
+                         loading="lazy"
+                         width="120" height="120">
+                  </a>
+                {%- endif -%}
+              </div>
+              <div class="cart-item__details">
+                <a href="{{ item.url }}" class="cart-item__title">{{ item.product.title }}</a>
+                {%- unless item.product.has_only_default_variant -%}
+                  <p class="cart-item__variant">{{ item.variant.title }}</p>
+                {%- endunless -%}
+              </div>
+              <div class="cart-item__price">{{ item.original_price | money }}</div>
+              <div class="cart-item__quantity">
+                <div class="product-quantity__input-wrap product-quantity__input-wrap--sm">
+                  <button type="button" class="product-quantity__btn product-quantity__btn--minus cart-qty-btn" data-key="{{ item.key }}" data-change="-1">−</button>
+                  <input type="number" value="{{ item.quantity }}" min="0" class="product-quantity__input cart-qty-input" data-key="{{ item.key }}">
+                  <button type="button" class="product-quantity__btn product-quantity__btn--plus cart-qty-btn" data-key="{{ item.key }}" data-change="1">＋</button>
+                </div>
+              </div>
+              <div class="cart-item__total">{{ item.final_line_price | money }}</div>
+              <button class="cart-item__remove" data-key="{{ item.key }}" aria-label="{{ item.product.title }}を削除">×</button>
+            </div>
+          {%- endfor -%}
+        </div>
+
+        <div class="cart-summary">
+          <div class="cart-summary__inner">
+            <h2 class="cart-summary__title">注文概要</h2>
+            <div class="cart-summary__row">
+              <span>小計</span>
+              <span id="cart-subtotal">{{ cart.total_price | money }}</span>
+            </div>
+            <div class="cart-summary__row cart-summary__row--muted">
+              <span>送料</span>
+              <span>購入手続き時に計算</span>
+            </div>
+            {%- if cart.total_price < 550000 -%}
+              <div class="cart-summary__free-shipping">
+                あと{{ 550000 | minus: cart.total_price | money }}で送料無料！
+              </div>
+            {%- else -%}
+              <div class="cart-summary__free-shipping cart-summary__free-shipping--qualified">
+                送料無料対象です 🎉
+              </div>
+            {%- endif -%}
+
+            {%- if section.settings.show_order_note -%}
+              <div class="cart-note">
+                <label for="cart-note" class="cart-note__label">注文メモ（任意）</label>
+                <textarea id="cart-note" name="note" class="cart-note__input" rows="3" placeholder="配送に関するご要望など">{{ cart.note }}</textarea>
+              </div>
+            {%- endif -%}
+
+            <a href="/checkout" class="btn btn--primary btn--full btn--large cart-checkout-btn">
+              購入手続きへ（{{ cart.total_price | money }}）
+            </a>
+            <a href="/collections/all" class="cart-summary__continue">← 買い物を続ける</a>
+          </div>
+        </div>
+      </div>
+    {%- else -%}
+      <div class="cart-empty">
+        <p class="cart-empty__icon" aria-hidden="true">🛒</p>
+        <p class="cart-empty__text">カートに商品がありません</p>
+        <a href="/collections/all" class="btn btn--primary btn--large">商品を見る</a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script>
+(function () {
+  function updateCart(key, quantity) {
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: key, quantity: quantity }),
+    })
+      .then(function (res) { return res.json(); })
+      .then(function () { location.reload(); });
+  }
+
+  document.querySelectorAll('.cart-qty-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const key = btn.dataset.key;
+      const input = document.querySelector('.cart-qty-input[data-key="' + key + '"]');
+      const current = parseInt(input.value);
+      const next = current + parseInt(btn.dataset.change);
+      if (next >= 0) updateCart(key, next);
+    });
+  });
+
+  document.querySelectorAll('.cart-item__remove').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      updateCart(btn.dataset.key, 0);
+    });
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "カートページ",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_order_note",
+      "label": "注文メモ欄を表示",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

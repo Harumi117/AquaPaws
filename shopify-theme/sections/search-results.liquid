@@ -1,0 +1,84 @@
+<section class="search-results section-padding">
+  <div class="container">
+    <div class="search-results__header">
+      <h1 class="search-results__title">
+        {%- if search.performed -%}
+          「{{ search.terms | escape }}」の検索結果
+        {%- else -%}
+          商品を検索
+        {%- endif -%}
+      </h1>
+
+      <form action="/search" method="get" class="search-form" role="search">
+        <div class="search-form__inner">
+          <input type="hidden" name="type" value="product">
+          <input type="search"
+                 name="q"
+                 value="{{ search.terms | escape }}"
+                 placeholder="キーワードを入力..."
+                 class="search-form__input"
+                 aria-label="検索キーワード"
+                 autofocus>
+          <button type="submit" class="search-form__btn" aria-label="検索">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    {%- if search.performed -%}
+      {%- if search.results_count == 0 -%}
+        <div class="search-empty">
+          <p class="search-empty__text">「{{ search.terms | escape }}」に一致する商品が見つかりませんでした。</p>
+          <ul class="search-empty__tips">
+            <li>キーワードのスペルをご確認ください</li>
+            <li>別のキーワードでお試しください</li>
+            <li>より一般的なキーワードを使用してみてください</li>
+          </ul>
+        </div>
+      {%- else -%}
+        <p class="search-results__count">{{ search.results_count }}件の商品が見つかりました</p>
+        {%- paginate search.results by 24 -%}
+          <div class="product-grid product-grid--4">
+            {%- for result in search.results -%}
+              {%- if result.object_type == 'product' -%}
+                {%- render 'product-card', product: result -%}
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+
+          {%- if paginate.pages > 1 -%}
+            <nav class="pagination" aria-label="ページナビゲーション">
+              {%- if paginate.previous -%}
+                <a href="{{ paginate.previous.url }}" class="pagination__btn">← 前へ</a>
+              {%- endif -%}
+              <div class="pagination__pages">
+                {%- for part in paginate.parts -%}
+                  {%- if part.is_link -%}
+                    <a href="{{ part.url }}" class="pagination__page">{{ part.title }}</a>
+                  {%- elsif part.title == paginate.current_page -%}
+                    <span class="pagination__page pagination__page--current">{{ part.title }}</span>
+                  {%- else -%}
+                    <span class="pagination__ellipsis">{{ part.title }}</span>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+              {%- if paginate.next -%}
+                <a href="{{ paginate.next.url }}" class="pagination__btn">次へ →</a>
+              {%- endif -%}
+            </nav>
+          {%- endif -%}
+        {%- endpaginate -%}
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "検索結果",
+  "settings": []
+}
+{% endschema %}

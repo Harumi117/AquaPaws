@@ -1,0 +1,84 @@
+<section class="account-page section-padding">
+  <div class="container">
+    <div class="account-header">
+      <h1 class="account-header__title">マイアカウント</h1>
+      <a href="/account/logout" class="btn btn--outline-dark">ログアウト</a>
+    </div>
+
+    <div class="account-layout">
+      <!-- サイドバー -->
+      <nav class="account-nav">
+        <ul class="account-nav__list">
+          <li><a href="/account" class="account-nav__link account-nav__link--active">注文履歴</a></li>
+          <li><a href="/account/addresses" class="account-nav__link">配送先住所</a></li>
+        </ul>
+      </nav>
+
+      <!-- コンテンツ -->
+      <div class="account-content">
+        <h2 class="account-content__title">注文履歴</h2>
+
+        {%- if customer.orders.size > 0 -%}
+          <div class="order-list">
+            {%- for order in customer.orders -%}
+              <div class="order-card">
+                <div class="order-card__header">
+                  <div>
+                    <p class="order-card__number">
+                      <a href="{{ order.customer_url }}" class="order-card__link">注文番号 {{ order.name }}</a>
+                    </p>
+                    <p class="order-card__date">{{ order.created_at | date: '%Y年%m月%d日' }}</p>
+                  </div>
+                  <div class="order-card__status">
+                    <span class="order-status order-status--{{ order.fulfillment_status }}">
+                      {%- case order.fulfillment_status -%}
+                        {%- when 'fulfilled' -%}発送済み
+                        {%- when 'partial' -%}一部発送済み
+                        {%- else -%}処理中
+                      {%- endcase -%}
+                    </span>
+                  </div>
+                </div>
+                <div class="order-card__items">
+                  {%- for line_item in order.line_items limit: 3 -%}
+                    <div class="order-item">
+                      {%- if line_item.image -%}
+                        <img src="{{ line_item.image | image_url: width: 80 }}"
+                             alt="{{ line_item.title | escape }}"
+                             loading="lazy"
+                             width="80" height="80">
+                      {%- endif -%}
+                      <div class="order-item__info">
+                        <p class="order-item__title">{{ line_item.title }}</p>
+                        <p class="order-item__qty">× {{ line_item.quantity }}</p>
+                      </div>
+                    </div>
+                  {%- endfor -%}
+                  {%- if order.line_items.size > 3 -%}
+                    <p class="order-card__more">他 {{ order.line_items.size | minus: 3 }}件</p>
+                  {%- endif -%}
+                </div>
+                <div class="order-card__footer">
+                  <span class="order-card__total">合計 {{ order.total_price | money }}</span>
+                  <a href="{{ order.customer_url }}" class="btn btn--outline-dark btn--sm">詳細を見る</a>
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- else -%}
+          <div class="account-empty">
+            <p>まだ注文履歴がありません。</p>
+            <a href="/collections/all" class="btn btn--primary">商品を見る</a>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "アカウントページ",
+  "settings": []
+}
+{% endschema %}

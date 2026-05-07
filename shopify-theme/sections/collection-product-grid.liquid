@@ -1,0 +1,259 @@
+<section class="collection-grid section-padding">
+  <div class="container">
+    <div class="collection-grid__layout">
+
+      <!-- サイドバーフィルター -->
+      {%- if section.settings.enable_filtering -%}
+        <aside class="collection-filters" id="collection-filters">
+          <div class="collection-filters__header">
+            <h2 class="collection-filters__title">絞り込み</h2>
+            <button class="collection-filters__clear" id="filters-clear">クリア</button>
+          </div>
+
+          {%- for filter in collection.filters -%}
+            <details class="filter-group" open>
+              <summary class="filter-group__toggle">
+                {{ filter.label }}
+                <svg class="icon-chevron" width="12" height="8" viewBox="0 0 12 8" aria-hidden="true">
+                  <path d="M1 1l5 5 5-5" stroke="currentColor" fill="none" stroke-width="1.5"/>
+                </svg>
+              </summary>
+              <div class="filter-group__body">
+                {%- case filter.type -%}
+                  {%- when 'boolean', 'list' -%}
+                    <ul class="filter-list">
+                      {%- for filter_value in filter.values -%}
+                        <li class="filter-list__item">
+                          <label class="filter-list__label">
+                            <input type="checkbox"
+                                   name="{{ filter_value.param_name }}"
+                                   value="{{ filter_value.value }}"
+                                   class="filter-checkbox"
+                                   {% if filter_value.active %}checked{% endif %}
+                                   {% if filter_value.count == 0 and filter_value.active == false %}disabled{% endif %}>
+                            <span class="filter-list__text">{{ filter_value.label }}</span>
+                            <span class="filter-list__count">({{ filter_value.count }})</span>
+                          </label>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  {%- when 'price_range' -%}
+                    <div class="filter-price">
+                      <div class="filter-price__inputs">
+                        <div class="filter-price__input-wrap">
+                          <label for="filter-price-min">¥</label>
+                          <input type="number"
+                                 id="filter-price-min"
+                                 name="{{ filter.min_value.param_name }}"
+                                 value="{{ filter.min_value.value | divided_by: 100 | ceil }}"
+                                 placeholder="{{ filter.range_min | divided_by: 100 | ceil }}"
+                                 class="filter-price__input">
+                        </div>
+                        <span>〜</span>
+                        <div class="filter-price__input-wrap">
+                          <label for="filter-price-max">¥</label>
+                          <input type="number"
+                                 id="filter-price-max"
+                                 name="{{ filter.max_value.param_name }}"
+                                 value="{{ filter.max_value.value | divided_by: 100 | ceil }}"
+                                 placeholder="{{ filter.range_max | divided_by: 100 | ceil }}"
+                                 class="filter-price__input">
+                        </div>
+                      </div>
+                    </div>
+                {%- endcase -%}
+              </div>
+            </details>
+          {%- endfor -%}
+
+          <button class="btn btn--primary btn--full" id="filters-apply">絞り込みを適用</button>
+        </aside>
+      {%- endif -%}
+
+      <!-- 商品グリッド -->
+      <div class="collection-grid__main">
+        <div class="collection-grid__toolbar">
+          <p class="collection-grid__count">
+            {{ collection.products_count }}件の商品
+          </p>
+
+          {%- if section.settings.enable_sorting -%}
+            <div class="collection-sort">
+              <label for="sort-by" class="collection-sort__label">並び替え：</label>
+              <select id="sort-by" name="sort_by" class="collection-sort__select">
+                {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+                {%- for option in collection.sort_options -%}
+                  <option value="{{ option.value }}" {% if option.value == sort_by %}selected{% endif %}>
+                    {{ option.name }}
+                  </option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endif -%}
+
+          <button class="collection-grid__filter-toggle" id="filter-toggle" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>
+            </svg>
+            絞り込み
+          </button>
+        </div>
+
+        <!-- アクティブフィルター -->
+        {%- assign active_filters_count = 0 -%}
+        {%- for filter in collection.filters -%}
+          {%- assign active_filters_count = active_filters_count | plus: filter.active_values.size -%}
+        {%- endfor -%}
+        {%- if active_filters_count > 0 -%}
+          <div class="active-filters">
+            {%- for filter in collection.filters -%}
+              {%- for filter_value in filter.active_values -%}
+                <a href="{{ filter_value.url_to_remove }}" class="active-filter">
+                  {{ filter_value.label }} ×
+                </a>
+              {%- endfor -%}
+            {%- endfor -%}
+            <a href="{{ collection.url }}" class="active-filters__clear">すべてクリア</a>
+          </div>
+        {%- endif -%}
+
+        {%- paginate collection.products by section.settings.products_per_page -%}
+          {%- if collection.products.size > 0 -%}
+            <div class="product-grid product-grid--{{ section.settings.columns_desktop }}">
+              {%- for product in collection.products -%}
+                {%- render 'product-card', product: product -%}
+              {%- endfor -%}
+            </div>
+
+            {%- if paginate.pages > 1 -%}
+              <nav class="pagination" aria-label="ページナビゲーション">
+                {%- if paginate.previous -%}
+                  <a href="{{ paginate.previous.url }}" class="pagination__btn pagination__btn--prev">
+                    ← 前へ
+                  </a>
+                {%- endif -%}
+                <div class="pagination__pages">
+                  {%- for part in paginate.parts -%}
+                    {%- if part.is_link -%}
+                      <a href="{{ part.url }}" class="pagination__page">{{ part.title }}</a>
+                    {%- elsif part.title == paginate.current_page -%}
+                      <span class="pagination__page pagination__page--current" aria-current="page">{{ part.title }}</span>
+                    {%- else -%}
+                      <span class="pagination__ellipsis">{{ part.title }}</span>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+                {%- if paginate.next -%}
+                  <a href="{{ paginate.next.url }}" class="pagination__btn pagination__btn--next">
+                    次へ →
+                  </a>
+                {%- endif -%}
+              </nav>
+            {%- endif -%}
+          {%- else -%}
+            <div class="collection-empty">
+              <p class="collection-empty__text">条件に合う商品が見つかりませんでした。</p>
+              <a href="{{ collection.url }}" class="btn btn--primary">絞り込みをリセット</a>
+            </div>
+          {%- endif -%}
+        {%- endpaginate -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  // Sort
+  const sortSelect = document.getElementById('sort-by');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function () {
+      const url = new URL(window.location.href);
+      url.searchParams.set('sort_by', sortSelect.value);
+      window.location.href = url.toString();
+    });
+  }
+
+  // Filter toggle (mobile)
+  const filterToggle = document.getElementById('filter-toggle');
+  const filtersPanel = document.getElementById('collection-filters');
+  if (filterToggle && filtersPanel) {
+    filterToggle.addEventListener('click', function () {
+      const isOpen = filterToggle.getAttribute('aria-expanded') === 'true';
+      filterToggle.setAttribute('aria-expanded', String(!isOpen));
+      filtersPanel.classList.toggle('collection-filters--open', !isOpen);
+    });
+  }
+
+  // Apply filters
+  const applyBtn = document.getElementById('filters-apply');
+  if (applyBtn) {
+    applyBtn.addEventListener('click', function () {
+      const url = new URL(window.location.href);
+      url.search = '';
+
+      document.querySelectorAll('.filter-checkbox:checked').forEach(function (checkbox) {
+        url.searchParams.append(checkbox.name, checkbox.value);
+      });
+
+      const minInput = document.getElementById('filter-price-min');
+      const maxInput = document.getElementById('filter-price-max');
+      if (minInput && minInput.value) {
+        url.searchParams.set(minInput.name, parseInt(minInput.value) * 100);
+      }
+      if (maxInput && maxInput.value) {
+        url.searchParams.set(maxInput.name, parseInt(maxInput.value) * 100);
+      }
+
+      window.location.href = url.toString();
+    });
+  }
+
+  // Clear filters
+  const clearBtn = document.getElementById('filters-clear');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', function () {
+      window.location.href = window.location.pathname;
+    });
+  }
+})();
+</script>
+
+{% schema %}
+{
+  "name": "商品グリッド",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 12,
+      "max": 48,
+      "step": 12,
+      "label": "1ページの商品数",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "PC表示列数",
+      "options": [
+        { "value": "3", "label": "3列" },
+        { "value": "4", "label": "4列" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_filtering",
+      "label": "フィルタリングを有効化",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_sorting",
+      "label": "並び替えを有効化",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

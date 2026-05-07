@@ -4,7 +4,7 @@
       "type": "collection-banner",
       "settings": {}
     },
-    "product-grid": {
+    "collection-product-grid": {
       "type": "collection-product-grid",
       "settings": {
         "columns_desktop": "4",
@@ -14,5 +14,5 @@
       }
     }
   },
-  "order": ["collection-banner", "product-grid"]
+  "order": ["collection-banner", "collection-product-grid"]
 }
