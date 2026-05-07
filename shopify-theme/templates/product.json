@@ -1,0 +1,21 @@
+{
+  "sections": {
+    "product-main": {
+      "type": "product-main",
+      "settings": {
+        "show_vendor": true,
+        "show_tags": true,
+        "enable_zoom": true
+      }
+    },
+    "product-recommendations": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "関連商品",
+        "products_to_show": 4,
+        "columns_desktop": "4"
+      }
+    }
+  },
+  "order": ["product-main", "product-recommendations"]
+}

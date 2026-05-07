@@ -1,0 +1,107 @@
+{
+  "sections": {
+    "announcement-bar": {
+      "type": "announcement-bar",
+      "settings": {
+        "show_announcement": true,
+        "text": "🐾 送料無料キャンペーン実施中！5,500円以上のご購入で送料無料 🐾",
+        "bg_color": "#8B5E3C",
+        "text_color": "#FFFFFF"
+      }
+    },
+    "hero-banner": {
+      "type": "hero-banner",
+      "settings": {
+        "eyebrow": "いぬとねこと、しあわせに",
+        "heading": "わたしいぬ\nわたしねこライフ",
+        "subheading": "大切なペットとの毎日を、もっと豊かに。\n厳選されたペット用品をお届けします。",
+        "btn1_label": "犬用商品を見る",
+        "btn2_label": "猫用商品を見る",
+        "overlay_opacity": 35
+      }
+    },
+    "pet-category": {
+      "type": "pet-category",
+      "settings": {
+        "heading": "カテゴリーから探す",
+        "subheading": "いぬ用・ねこ用、それぞれのライフスタイルに合わせた商品をご用意しています"
+      },
+      "blocks": {
+        "block-dog": {
+          "type": "category",
+          "settings": {
+            "icon": "🐶",
+            "title": "いぬ用品",
+            "description": "フード・おもちゃ・お散歩グッズ",
+            "cta": "いぬ用品を見る"
+          }
+        },
+        "block-cat": {
+          "type": "category",
+          "settings": {
+            "icon": "🐱",
+            "title": "ねこ用品",
+            "description": "フード・爪とぎ・キャットタワー",
+            "cta": "ねこ用品を見る"
+          }
+        },
+        "block-house": {
+          "type": "category",
+          "settings": {
+            "icon": "🏠",
+            "title": "ハウス・ベッド",
+            "description": "快適な住まいを提供する",
+            "cta": "ハウスを見る"
+          }
+        },
+        "block-fashion": {
+          "type": "category",
+          "settings": {
+            "icon": "🎀",
+            "title": "ファッション",
+            "description": "おしゃれなお洋服・アクセサリー",
+            "cta": "ファッションを見る"
+          }
+        }
+      },
+      "blocks_order": ["block-dog", "block-cat", "block-house", "block-fashion"]
+    },
+    "featured-new": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "新着商品",
+        "subheading": "最新のペット用品をチェック",
+        "products_to_show": 8,
+        "columns_desktop": "4",
+        "bg_style": "default"
+      }
+    },
+    "featured-popular": {
+      "type": "featured-collection",
+      "settings": {
+        "heading": "人気商品",
+        "subheading": "みんなに選ばれているアイテム",
+        "products_to_show": 8,
+        "columns_desktop": "4",
+        "bg_style": "tinted"
+      }
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "ペットライフをもっと楽しく",
+        "subheading": "新商品情報・お得なキャンペーン・ペットケアのヒントをお届けします。\nメルマガ登録で初回10%OFF！",
+        "btn_label": "無料で登録する",
+        "bg_color": "#FDF6EE"
+      }
+    }
+  },
+  "order": [
+    "announcement-bar",
+    "hero-banner",
+    "pet-category",
+    "featured-new",
+    "featured-popular",
+    "newsletter"
+  ]
+}

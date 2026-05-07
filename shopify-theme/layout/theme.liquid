@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ page_description | escape }}">
+  <link rel="canonical" href="{{ canonical_url }}">
+
+  <title>
+    {%- if template == 'index' -%}
+      {{ shop.name }} | いぬ・ねこと暮らすライフスタイルショップ
+    {%- else -%}
+      {{ page_title }} | {{ shop.name }}
+    {%- endif -%}
+  </title>
+
+  {{ content_for_header }}
+
+  {{ 'theme.css' | asset_url | stylesheet_tag }}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="template-{{ template | replace: '.', '-' | handle }}">
+  {%- sections 'announcement-bar' -%}
+  {%- sections 'header' -%}
+
+  <main id="main-content" tabindex="-1">
+    {{ content_for_layout }}
+  </main>
+
+  {%- sections 'footer' -%}
+
+  <div id="cart-drawer" class="cart-drawer" aria-hidden="true">
+    <div class="cart-drawer__overlay"></div>
+    <div class="cart-drawer__inner">
+      <div class="cart-drawer__header">
+        <h2>カート</h2>
+        <button class="cart-drawer__close" aria-label="カートを閉じる">&times;</button>
+      </div>
+      <div class="cart-drawer__body" id="cart-drawer-body">
+        {%- if cart.item_count == 0 -%}
+          <p class="cart-drawer__empty">カートに商品がありません</p>
+        {%- endif -%}
+      </div>
+      <div class="cart-drawer__footer">
+        <a href="/cart" class="btn btn--primary btn--full">カートを見る</a>
+        <a href="/checkout" class="btn btn--secondary btn--full">購入手続きへ</a>
+      </div>
+    </div>
+  </div>
+
+  {{ 'theme.js' | asset_url | script_tag }}
+</body>
+</html>

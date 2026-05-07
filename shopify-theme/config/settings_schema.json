@@ -1,0 +1,114 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "わたしいぬわたしねこライフ",
+    "theme_version": "1.0.0",
+    "theme_author": "AquaPaws",
+    "theme_documentation_url": "",
+    "theme_support_url": ""
+  },
+  {
+    "name": "カラー設定",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_primary",
+        "label": "メインカラー",
+        "default": "#8B5E3C"
+      },
+      {
+        "type": "color",
+        "id": "color_secondary",
+        "label": "サブカラー",
+        "default": "#4A7C59"
+      },
+      {
+        "type": "color",
+        "id": "color_accent",
+        "label": "アクセントカラー",
+        "default": "#D4956A"
+      },
+      {
+        "type": "color",
+        "id": "color_bg",
+        "label": "背景色",
+        "default": "#FFFFFF"
+      },
+      {
+        "type": "color",
+        "id": "color_text",
+        "label": "テキスト色",
+        "default": "#2C1810"
+      }
+    ]
+  },
+  {
+    "name": "タイポグラフィ",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "font_heading",
+        "label": "見出しフォント",
+        "default": "noto_serif_jp_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "font_body",
+        "label": "本文フォント",
+        "default": "noto_sans_jp_n4"
+      },
+      {
+        "type": "range",
+        "id": "font_size_base",
+        "min": 13,
+        "max": 18,
+        "step": 1,
+        "unit": "px",
+        "label": "基本フォントサイズ",
+        "default": 15
+      }
+    ]
+  },
+  {
+    "name": "ソーシャルメディア",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_instagram",
+        "label": "Instagram URL"
+      },
+      {
+        "type": "text",
+        "id": "social_twitter",
+        "label": "Twitter/X URL"
+      },
+      {
+        "type": "text",
+        "id": "social_line",
+        "label": "LINE URL"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube",
+        "label": "YouTube URL"
+      }
+    ]
+  },
+  {
+    "name": "決済・配送",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "show_payment_icons",
+        "label": "支払い方法アイコンを表示",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "free_shipping_threshold",
+        "label": "送料無料ライン（円）",
+        "default": "5500"
+      }
+    ]
+  }
+]

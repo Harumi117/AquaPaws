@@ -1,0 +1,116 @@
+<section class="hero-banner {% if section.settings.image != blank %}hero-banner--has-image{% endif %}"
+  {% if section.settings.image != blank %}
+    style="background-image: url('{{ section.settings.image | image_url: width: 1920 }}');"
+  {% endif %}>
+  <div class="hero-banner__overlay" style="background-color: {{ section.settings.overlay_color }}; opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};"></div>
+  <div class="container">
+    <div class="hero-banner__content hero-banner__content--{{ section.settings.text_align }}">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="hero-banner__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h1 class="hero-banner__heading">{{ section.settings.heading }}</h1>
+      {%- endif -%}
+      {%- if section.settings.subheading != blank -%}
+        <p class="hero-banner__subheading">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+      <div class="hero-banner__buttons">
+        {%- if section.settings.btn1_label != blank -%}
+          <a href="{{ section.settings.btn1_link }}" class="btn btn--primary btn--large">
+            {{ section.settings.btn1_label }}
+          </a>
+        {%- endif -%}
+        {%- if section.settings.btn2_label != blank -%}
+          <a href="{{ section.settings.btn2_link }}" class="btn btn--outline btn--large">
+            {{ section.settings.btn2_label }}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "ヒーローバナー",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "背景画像"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "オーバーレイ色",
+      "default": "#2C1810"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "オーバーレイ透明度",
+      "default": 40
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "テキスト位置",
+      "options": [
+        { "value": "left", "label": "左" },
+        { "value": "center", "label": "中央" },
+        { "value": "right", "label": "右" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "サブタイトル（上）",
+      "default": "いぬとねこと、しあわせに"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "メイン見出し",
+      "default": "わたしいぬ\nわたしねこライフ"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "説明文",
+      "default": "大切なペットとの毎日を、もっと豊かに。\n厳選されたペット用品をお届けします。"
+    },
+    {
+      "type": "text",
+      "id": "btn1_label",
+      "label": "ボタン1 テキスト",
+      "default": "犬用商品を見る"
+    },
+    {
+      "type": "url",
+      "id": "btn1_link",
+      "label": "ボタン1 リンク"
+    },
+    {
+      "type": "text",
+      "id": "btn2_label",
+      "label": "ボタン2 テキスト",
+      "default": "猫用商品を見る"
+    },
+    {
+      "type": "url",
+      "id": "btn2_link",
+      "label": "ボタン2 リンク"
+    }
+  ],
+  "presets": [
+    {
+      "name": "ヒーローバナー"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,68 @@
+<div class="product-card">
+  <div class="product-card__image-wrapper">
+    <a href="{{ product.url }}" class="product-card__image-link" tabindex="-1" aria-hidden="true">
+      {%- if product.featured_image != blank -%}
+        <img class="product-card__image product-card__image--primary"
+             src="{{ product.featured_image | image_url: width: 600 }}"
+             alt="{{ product.featured_image.alt | escape }}"
+             loading="lazy"
+             width="600"
+             height="{{ 600 | divided_by: product.featured_image.aspect_ratio | ceil }}">
+        {%- if product.images[1] != blank -%}
+          <img class="product-card__image product-card__image--secondary"
+               src="{{ product.images[1] | image_url: width: 600 }}"
+               alt="{{ product.images[1].alt | escape }}"
+               loading="lazy"
+               width="600"
+               height="{{ 600 | divided_by: product.images[1].aspect_ratio | ceil }}">
+        {%- endif -%}
+      {%- else -%}
+        <div class="product-card__image-placeholder">
+          <svg viewBox="0 0 100 100" fill="currentColor" aria-hidden="true">
+            <text y=".9em" font-size="90">🐾</text>
+          </svg>
+        </div>
+      {%- endif -%}
+    </a>
+
+    <div class="product-card__badges">
+      {%- if product.available == false -%}
+        <span class="badge badge--sold-out">売り切れ</span>
+      {%- elsif product.compare_at_price > product.price -%}
+        {%- assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price -%}
+        <span class="badge badge--sale">{{ discount }}% OFF</span>
+      {%- endif -%}
+      {%- if product.tags contains '新商品' -%}
+        <span class="badge badge--new">NEW</span>
+      {%- endif -%}
+    </div>
+
+    {%- unless product.available == false -%}
+      <button class="product-card__quick-add"
+              data-product-id="{{ product.variants.first.id }}"
+              aria-label="{{ product.title }}をカートに追加">
+        カートに追加
+      </button>
+    {%- endunless -%}
+  </div>
+
+  <div class="product-card__info">
+    {%- if product.vendor != blank -%}
+      <p class="product-card__vendor">{{ product.vendor }}</p>
+    {%- endif -%}
+    <h3 class="product-card__title">
+      <a href="{{ product.url }}" class="product-card__title-link">{{ product.title }}</a>
+    </h3>
+    <div class="product-card__price">
+      {%- if product.compare_at_price > product.price -%}
+        <span class="product-card__price--compare">{{ product.compare_at_price | money }}</span>
+        <span class="product-card__price--sale">{{ product.price | money }}</span>
+      {%- else -%}
+        <span class="product-card__price--regular">{{ product.price | money }}</span>
+      {%- endif -%}
+      {%- if product.price_varies -%}
+        <span class="product-card__price--from">から</span>
+      {%- endif -%}
+    </div>
+  </div>
+</div>

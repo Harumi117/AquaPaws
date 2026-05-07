@@ -1,0 +1,13 @@
+{
+  "current": {
+    "color_primary": "#8B5E3C",
+    "color_secondary": "#4A7C59",
+    "color_accent": "#D4956A",
+    "color_bg": "#FFFFFF",
+    "color_text": "#2C1810",
+    "font_size_base": 15,
+    "show_payment_icons": true,
+    "free_shipping_threshold": "5500"
+  },
+  "presets": {}
+}

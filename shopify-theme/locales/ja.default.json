@@ -1,0 +1,74 @@
+{
+  "general": {
+    "language": "日本語",
+    "close": "閉じる",
+    "loading": "読み込み中...",
+    "search": "検索",
+    "page_not_found": "ページが見つかりません"
+  },
+  "cart": {
+    "title": "カート",
+    "empty": "カートに商品がありません",
+    "add_to_cart": "カートに追加",
+    "adding": "追加中...",
+    "added": "カートに追加しました",
+    "checkout": "購入手続きへ",
+    "view_cart": "カートを見る",
+    "subtotal": "小計",
+    "remove": "削除",
+    "quantity": "数量",
+    "note": "注文メモ"
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "カートに追加",
+      "sold_out": "売り切れ",
+      "from": "から",
+      "sale": "セール",
+      "new": "新商品",
+      "description": "商品説明",
+      "reviews": "レビュー",
+      "share": "シェアする"
+    },
+    "facets": {
+      "sort_by": "並び替え",
+      "filter_by": "絞り込み",
+      "best_selling": "人気順",
+      "price_ascending": "価格: 安い順",
+      "price_descending": "価格: 高い順",
+      "newest": "新着順",
+      "clear": "クリア",
+      "apply": "適用",
+      "results": "{{count}}件"
+    }
+  },
+  "collections": {
+    "all": "すべての商品",
+    "products_count": "{{count}}件の商品"
+  },
+  "customer": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "register": "新規会員登録",
+    "account": "マイアカウント",
+    "orders": "注文履歴",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "first_name": "名",
+    "last_name": "姓",
+    "forgot_password": "パスワードをお忘れですか？"
+  },
+  "newsletter": {
+    "subscribe": "メルマガ登録",
+    "success": "ご登録ありがとうございます！",
+    "placeholder": "メールアドレスを入力してください",
+    "submit": "登録する"
+  },
+  "accessibility": {
+    "skip_to_content": "コンテンツへスキップ",
+    "open_cart": "カートを開く",
+    "close_cart": "カートを閉じる",
+    "open_menu": "メニューを開く",
+    "close_menu": "メニューを閉じる"
+  }
+}
