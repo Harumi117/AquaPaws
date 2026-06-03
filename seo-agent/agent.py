@@ -139,7 +139,7 @@ def run_pipeline(url: str) -> None:
     seo_phase: str | None = None
 
     print(f"\n{'='*60}")
-    print("分析を開始します（全自動モード）")
+    print("Sera が分析を開始します...")
     print(f"{'='*60}\n")
 
     for prompt in PROMPTS:
@@ -174,7 +174,7 @@ def run_pipeline(url: str) -> None:
 
         # Claudeに送信
         messages.append({"role": "user", "content": text})
-        print("\n  Claude が分析中...", end="", flush=True)
+        print("\n  Sera が分析中...", end="", flush=True)
 
         response_text = _call_claude(client, messages)
         messages.append({"role": "assistant", "content": response_text})
@@ -190,5 +190,5 @@ def run_pipeline(url: str) -> None:
 
     filename = _save_results(url, results)
     print(f"\n{'='*60}")
-    print(f"分析完了！レポートを保存しました: {filename}")
+    print(f"Sera の分析完了！レポートを保存しました: {filename}")
     print("=" * 60)

@@ -5,6 +5,7 @@ from agent import run_pipeline
 
 def main():
     if len(sys.argv) < 2:
+        print("Sera - EC商品ページ分析エージェント")
         print("使い方: python main.py <商品ページURL>")
         print("例:     python main.py https://item.rakuten.co.jp/shop/item123/")
         sys.exit(1)
