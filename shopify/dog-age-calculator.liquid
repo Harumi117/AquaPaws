@@ -20,6 +20,12 @@
   コレクションが未設定・存在しない場合、その部分は表示されません。
   計算機だけを使いたいときは collection を空文字にしてください。
 
+  【解説記事へのリンク】
+  計算機の下に「なぜ合わないのか、くわしく読む」というリンクがあります。
+  href="/blogs/news/dog-age-explained" の部分を、blog-article.html で
+  作った記事の実際のURLに書き換えてください（下で検索すると見つかります）。
+  リンクが不要なら、その1行ごと削除してかまいません。
+
   テーマの文字色・背景に自動でなじみます（ダークテーマでもそのまま使えます）。
   色を変えたいときは .dac { --dac-accent: ... } を書き換えてください。
 -->
@@ -380,18 +386,22 @@
   .dac-rule dfn { font-style: normal; font-weight: 700; }
   .dac-rule[data-active="true"] dfn { color: var(--dac-accent); }
 
-  /* ---- 解説 ---- */
+  /* ---- 解説記事への案内 ---- */
 
   .dac-about {
     border-top: 1px solid var(--dac-line);
-    padding-top: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
+    padding-top: 20px;
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--dac-soft);
   }
-  .dac-about section { display: flex; flex-direction: column; gap: 10px; }
-  .dac-about h3 { font-size: 16px; font-weight: 700; margin: 0; line-height: 1.6; }
-  .dac-about p { margin: 0; font-size: 14px; line-height: 1.9; max-width: 34em; }
+  .dac-about a {
+    color: var(--dac-accent);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 
   .dac-note {
     margin: 0;
@@ -523,20 +533,10 @@
     </ul>
   </div>
 
-  <div class="dac-about">
-    <section>
-      <h3>「犬の1年は人の7年」は、なぜ合わないのか</h3>
-      <p>「7倍する」という覚え方は、人の寿命をおよそ70年、犬をおよそ10年として割った大まかな目安です。ただ、1年経った犬はもう体格が大人になり子どもを産むこともできますが、人間の7歳はまだ小学校に入ったばかり。犬の老化は最初に速く、あとからゆるやかになるので、一律に倍率をかける方法では無理が出ます。</p>
-    </section>
-    <section>
-      <h3>最初の2年で、一気に大人になる</h3>
-      <p>そこで時期を3つに分けています。1年目は人間でいう15歳ぶん、2年目は9歳ぶん育ち、ここまでの2年で24歳相当。3年目からはほぼ一定のペースになります。式が「24 ＋（年齢 − 2）× ○」という形なのは、この最初の2年ぶんに、3年目以降を足していく作りだからです。</p>
-    </section>
-    <section>
-      <h3>体が大きいほど、時計が速く進む</h3>
-      <p>3年目以降に足す年数は、小型犬4・中型犬5・大型犬7と変えています。小型犬が15年前後生きることは珍しくありませんが、大型犬では10年前後になることが多いためです。大きく育つぶん細胞分裂の回数が多く、老化や病気のリスクが上がるのではないか、という見方があります。</p>
-    </section>
-  </div>
+  <p class="dac-about">
+    「犬の1年は人間の7年」という覚え方は、実は正確ではありません。<br>
+    <a href="/blogs/news/dog-age-explained">なぜ合わないのか、くわしく読む →</a>
+  </p>
 
   <p class="dac-note">この計算は一般的な目安です。犬種や健康状態によって実際の老化の速さは変わります。気になることがあれば、かかりつけの獣医師にご相談ください。</p>
 
