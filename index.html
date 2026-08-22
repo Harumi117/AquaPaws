@@ -385,6 +385,73 @@ input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--a
 .crow[data-active="true"] .crow-value { color: var(--ink); }
 .crow-value .u { font-size: 12px; font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 400; margin-left: 1px; }
 
+/* ---- article ---- */
+
+.article {
+  border-top: 1px solid var(--line);
+  padding-top: 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.article-intro { display: flex; flex-direction: column; gap: 8px; }
+
+.article-title {
+  font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.45;
+  letter-spacing: .02em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.article section { display: flex; flex-direction: column; gap: 12px; }
+
+.article h3 {
+  font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.6;
+  letter-spacing: .02em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.article p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.95;
+  max-width: 34em;
+}
+
+.article .aside {
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.aside-label { font-size: 11px; letter-spacing: .14em; color: var(--ink-faint); }
+.aside-expr {
+  font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-weight: 700;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 2px;
+}
+.aside p { font-size: 13px; line-height: 1.85; color: var(--ink-soft); }
+
+.limits { margin: 0; padding: 0 0 0 1.15em; display: flex; flex-direction: column; gap: 7px; }
+.limits li { font-size: 14px; line-height: 1.85; }
+.limits li::marker { color: var(--amber); }
+
 /* ---- footer ---- */
 
 .disclaimer {
@@ -416,7 +483,7 @@ input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--a
 <main class="page">
 
   <header>
-    <h1>犬の年齢を、人間の年齢に。</h1>
+    <h1>うちの子は、いま何歳？</h1>
     <p class="lede">年齢とサイズを選ぶと、人間年齢の目安とライフステージが分かります。体が大きい犬ほど、歳の重ね方は速くなります。</p>
   </header>
 
@@ -523,6 +590,57 @@ input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--a
 
     </div>
   </section>
+
+  <article class="article">
+
+    <div class="article-intro">
+      <h2 class="article-title">なぜ、この計算になるのか</h2>
+      <p>ここまでの数字がどこから来ているのか、その考え方をまとめました。</p>
+    </div>
+
+    <section>
+      <h3>「犬の1年は人の7年」は、なぜ合わないのか</h3>
+      <p>いちばん有名なのは「7倍する」という覚え方です。人の寿命をおよそ70年、犬をおよそ10年として割った、とても大まかな目安だと言われています。</p>
+      <p>ただ、この計算は実際の犬の育ち方と噛み合いません。生まれて1年経った犬は、もう体格が大人になり、子どもを産むこともできます。いっぽう人間の7歳は、まだ小学校に入ったばかりです。同じ「7歳相当」とするには、あまりに開きがあります。</p>
+      <p>犬の老化は一定のペースで進むのではなく、<strong>最初に速く、あとからゆるやかになる</strong>。だから一律に倍率をかける方法では、どこかで必ず無理が出ます。</p>
+    </section>
+
+    <section>
+      <h3>最初の2年で、一気に大人になる</h3>
+      <p>そこでこのページでは、時期を3つに分けています。1年目はもっとも変化が大きく、人間でいう15歳ぶんほど育ちます。2年目はペースが落ちて9歳ぶん。ここまでの2年で、合わせて24歳相当に達します。</p>
+      <p>3年目からは、ほぼ一定のペースで歳を重ねていきます。計算式が「24 ＋（年齢 − 2）× ○」という形になっているのは、この「最初の2年ぶんの24歳」に、3年目以降を足していく作りだからです。</p>
+    </section>
+
+    <section>
+      <h3>体が大きいほど、時計が速く進む</h3>
+      <p>3年目以降に足す年数を、小型犬は4、中型犬は5、大型犬は7と変えています。これは体の大きい犬ほど寿命が短い傾向があるためです。小型犬が15年前後生きることは珍しくありませんが、大型犬では10年前後になることが多くなります。</p>
+      <p>ふしぎなことに、これは動物全体の傾向とは逆です。ふつう、ゾウのように体の大きな動物ほど長生きします。ところが同じ「犬」という種のなかでは、大きい個体ほど寿命が短くなる。理由はまだ完全には解明されていませんが、大きく育つぶん細胞分裂の回数が多く、成長を促すホルモンの影響で老化や病気のリスクが上がるのではないか、という見方があります。</p>
+    </section>
+
+    <section>
+      <h3>別の考え方 — 対数でとらえる</h3>
+      <p>年齢の換算方法はひとつではありません。2020年に発表された研究では、DNAの「メチル化」という、加齢とともに進む化学的な変化を人と犬で比べ、次の式が提案されました。</p>
+      <div class="aside">
+        <span class="aside-label">対数を使った換算式</span>
+        <span class="aside-expr">人間年齢 ＝ 16 × ln(犬の年齢) ＋ 31</span>
+        <p>ln は自然対数。1歳で約31歳、5歳で約57歳、10歳で約68歳となり、若い時期の急な変化と、その後のゆるやかさをなめらかな曲線で表します。ただしラブラドール・レトリバーを中心に調べられたもので、すべての犬種に当てはまるとは限りません。</p>
+      </div>
+      <p>このページで段階式を採用しているのは、暗算に近い形で追えて、どの数字がどこから来たのかが見えるからです。なめらかさより、分かりやすさを取っています。</p>
+    </section>
+
+    <section>
+      <h3>この計算で分からないこと</h3>
+      <p>どの式を使っても、出てくるのはあくまで目安です。次のような要素は、計算に含まれていません。</p>
+      <ul class="limits">
+        <li><strong>犬種ごとの差</strong>。同じ大型犬でも、寿命の傾向は犬種によって異なります。</li>
+        <li><strong>体格の個体差</strong>。ここでは体重3段階で分けていますが、実際にはなだらかに変化します。</li>
+        <li><strong>暮らし方と健康状態</strong>。食事、運動、歯の健康、去勢・避妊の有無なども寿命に関わると言われています。</li>
+        <li><strong>その子の状態そのもの</strong>。同じ年齢でも、元気な子もいれば、ケアが必要な子もいます。</li>
+      </ul>
+      <p>数字はきっかけとして使って、ふだんの様子といっしょに見てあげてください。7歳を過ぎたら健康診断の回数を増やす、といった目安づくりには役立つはずです。</p>
+    </section>
+
+  </article>
 
   <p class="disclaimer">この計算は一般的な目安です。犬種や健康状態によって実際の老化の速さは変わります。気になることがあれば、かかりつけの獣医師にご相談ください。</p>
 
