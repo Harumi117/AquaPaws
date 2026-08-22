@@ -67,6 +67,8 @@ open index.html
 streamlit run dog_age_calculator.py
 ```
 
+**Shopify版** — ストアのページに貼り付けて使う `shopify/dog-age-calculator.liquid`。計算結果のライフステージに応じて、おすすめ商品が切り替わります。設置手順は [shopify/README.md](shopify/README.md) を参照してください。
+
 ### 計算式
 
 - 1歳まで：年齢 × 15

@@ -1,0 +1,820 @@
+{%- comment -%}
+  ============================================================
+  犬の年齢計算ウィジェット（商品提案つき）
+  ============================================================
+
+  【入れ方】
+  Shopify管理画面 → オンラインストア → テーマ → カスタマイズ
+  → セクションを追加 →「カスタムLiquid」
+  → このファイルの中身をぜんぶ貼り付けて保存。
+
+  【商品提案の設定】
+  下の DAC_CONFIG の collection に、コレクションのハンドルを入れてください。
+  ハンドルはコレクションのURL末尾です。
+  例）https://example.myshopify.com/collections/puppy-food → puppy-food
+
+  コレクションが未設定・存在しない場合、その部分は表示されません。
+  計算機だけを使いたいときは collection を空文字にしてください。
+
+  テーマの文字色・背景に自動でなじみます（ダークテーマでもそのまま使えます）。
+  色を変えたいときは .dac { --dac-accent: ... } を書き換えてください。
+{%- endcomment -%}
+
+<style>
+  .dac {
+    /* ---- ここを変えると色が変わります ---- */
+    --dac-accent: #9A6216;      /* 選択中・強調 */
+    --dac-size-1: #6FAF8C;      /* 小型犬 */
+    --dac-size-2: #358055;      /* 中型犬 */
+    --dac-size-3: #14472F;      /* 大型犬 */
+    --dac-radius: 3px;
+
+    /* テーマの文字色から自動で作る面・罫線（明暗どちらのテーマでもなじみます） */
+    --dac-line:    rgba(128, 128, 128, .28);
+    --dac-sunk:    rgba(128, 128, 128, .10);
+    --dac-surface: rgba(128, 128, 128, .04);
+    --dac-soft:    rgba(128, 128, 128, 1);
+
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 8px 0 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    font-size: 16px;
+    line-height: 1.75;
+    color: inherit;
+    text-align: left;
+  }
+
+  @supports (color: color-mix(in srgb, currentColor 10%, transparent)) {
+    .dac {
+      --dac-line:    color-mix(in srgb, currentColor 22%, transparent);
+      --dac-sunk:    color-mix(in srgb, currentColor 7%, transparent);
+      --dac-surface: color-mix(in srgb, currentColor 3%, transparent);
+      --dac-soft:    color-mix(in srgb, currentColor 68%, transparent);
+    }
+  }
+
+  .dac *, .dac *::before, .dac *::after { box-sizing: border-box; }
+
+  .dac .dac-serif {
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", "Noto Serif JP", serif;
+  }
+
+  .dac-label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    color: var(--dac-soft);
+    margin: 0;
+  }
+
+  /* ---- 入力 ---- */
+
+  .dac-inputs { display: flex; flex-direction: column; gap: 26px; }
+  .dac-field { display: flex; flex-direction: column; gap: 12px; }
+
+  .dac-field-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .dac-readout {
+    font-weight: 700;
+    font-size: 22px;
+    font-variant-numeric: tabular-nums;
+    margin: 0;
+  }
+  .dac-readout .dac-u { font-size: 14px; color: var(--dac-soft); margin-left: 2px; }
+  .dac-readout .dac-mo { font-size: 13px; color: var(--dac-soft); font-weight: 400; margin-left: 6px; }
+
+  .dac-slider { display: flex; flex-direction: column; gap: 6px; }
+
+  .dac input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 28px;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+  .dac input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px; border-radius: 3px;
+    background: var(--dac-sunk);
+    border: 1px solid var(--dac-line);
+  }
+  .dac input[type="range"]::-moz-range-track {
+    height: 6px; border-radius: 3px;
+    background: var(--dac-sunk);
+    border: 1px solid var(--dac-line);
+  }
+  .dac input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; margin-top: -9px;
+    border-radius: 50%;
+    background: var(--dac-accent);
+    border: 3px solid var(--dac-accent);
+    box-shadow: 0 0 0 3px var(--dac-sunk);
+  }
+  .dac input[type="range"]::-moz-range-thumb {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--dac-accent);
+    border: 3px solid var(--dac-accent);
+  }
+  .dac input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--dac-accent); outline-offset: 3px; }
+  .dac input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--dac-accent); outline-offset: 3px; }
+
+  .dac-ticks {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 9px;
+    font-size: 11px;
+    color: var(--dac-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---- サイズ選択 ---- */
+
+  .dac-seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .dac-seg-item { position: relative; display: flex; }
+  .dac-seg-item input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+  .dac-seg-item label {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    margin: 0;
+    padding: 12px 8px 11px;
+    border: 1px solid var(--dac-line);
+    border-radius: var(--dac-radius);
+    background: var(--dac-sunk);
+    cursor: pointer;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .dac-seg-item input:checked + label {
+    background: var(--dac-surface);
+    border-color: var(--dac-accent);
+    box-shadow: inset 0 0 0 1px var(--dac-accent);
+  }
+  .dac-seg-item input:focus-visible + label { outline: 2px solid var(--dac-accent); outline-offset: 2px; }
+
+  .dac-swatch { width: 100%; max-width: 34px; height: 4px; border-radius: 2px; margin-bottom: 6px; }
+  .dac-seg-item:nth-child(1) .dac-swatch { background: var(--dac-size-1); }
+  .dac-seg-item:nth-child(2) .dac-swatch { background: var(--dac-size-2); }
+  .dac-seg-item:nth-child(3) .dac-swatch { background: var(--dac-size-3); }
+
+  .dac-seg-name { font-size: 14px; font-weight: 500; }
+  .dac-seg-item input:checked + label .dac-seg-name { font-weight: 700; }
+  .dac-seg-sub { font-size: 11px; color: var(--dac-soft); font-variant-numeric: tabular-nums; }
+
+  /* ---- 結果 ---- */
+
+  .dac-result {
+    border: 1px solid var(--dac-line);
+    border-radius: var(--dac-radius);
+    background: var(--dac-surface);
+    padding: 26px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .dac-result-label { font-size: 12px; letter-spacing: .18em; color: var(--dac-soft); margin: 0; }
+
+  .dac-figure {
+    font-weight: 700;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    line-height: 1;
+    margin: 12px 0 0;
+  }
+  .dac-figure .dac-approx { font-size: 20px; color: var(--dac-soft); }
+  .dac-figure .dac-num { font-size: 72px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .dac-figure .dac-unit { font-size: 24px; color: var(--dac-soft); }
+
+  .dac-stage {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 13px 5px 10px;
+    border-radius: 2px;
+    background: var(--dac-sunk);
+    color: var(--dac-accent);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    margin: 14px 0 0;
+  }
+  .dac-stage::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .dac-stage-note { font-size: 13px; color: var(--dac-soft); margin: 10px 0 0; max-width: 30em; }
+
+  /* ---- 商品提案 ---- */
+
+  .dac-shop { display: flex; flex-direction: column; gap: 14px; }
+  .dac-shop[hidden] { display: none; }
+
+  .dac-shop-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .dac-shop-title { font-size: 16px; font-weight: 700; margin: 0; }
+  .dac-shop-all {
+    font-size: 13px;
+    color: var(--dac-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .dac-products {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .dac-product a {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+  }
+  .dac-product a:hover .dac-product-name { text-decoration: underline; text-underline-offset: 3px; }
+  .dac-product a:focus-visible { outline: 2px solid var(--dac-accent); outline-offset: 3px; border-radius: var(--dac-radius); }
+
+  .dac-thumb {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    border-radius: var(--dac-radius);
+    background: var(--dac-sunk);
+    border: 1px solid var(--dac-line);
+    overflow: hidden;
+  }
+  .dac-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .dac-product-name { font-size: 13px; line-height: 1.6; }
+  .dac-product-price { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .dac-product-sold { font-size: 12px; color: var(--dac-soft); font-weight: 400; }
+
+  .dac-skeleton .dac-thumb { animation: dac-pulse 1.4s ease-in-out infinite; }
+  @keyframes dac-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+
+  /* ---- サイズ別の比較 ---- */
+
+  .dac-compare { display: flex; flex-direction: column; gap: 10px; }
+  .dac-compare-note { font-size: 13px; color: var(--dac-soft); margin: 2px 0 0; }
+  .dac-rows { display: flex; flex-direction: column; gap: 2px; }
+
+  .dac-row {
+    display: grid;
+    grid-template-columns: 4.5em 1fr 3.6em;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px 10px 11px;
+    border: 1px solid transparent;
+    border-left: 3px solid transparent;
+    border-radius: var(--dac-radius);
+  }
+  .dac-row[data-active="true"] {
+    background: var(--dac-surface);
+    border-color: var(--dac-line);
+    border-left-color: var(--dac-accent);
+  }
+  .dac-row-name { font-size: 14px; }
+  .dac-row[data-active="true"] .dac-row-name { font-weight: 700; }
+
+  .dac-track {
+    display: block;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--dac-sunk);
+    overflow: hidden;
+  }
+  .dac-fill {
+    display: block;
+    height: 100%;
+    min-width: 2px;
+    border-radius: 0 4px 4px 0;
+    transition: width .28s cubic-bezier(.22,.61,.36,1);
+  }
+  .dac-row:nth-child(1) .dac-fill { background: var(--dac-size-1); }
+  .dac-row:nth-child(2) .dac-fill { background: var(--dac-size-2); }
+  .dac-row:nth-child(3) .dac-fill { background: var(--dac-size-3); }
+
+  .dac-row-value {
+    font-weight: 700;
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: var(--dac-soft);
+  }
+  .dac-row[data-active="true"] .dac-row-value { color: inherit; }
+  .dac-row-value .dac-vu { font-size: 12px; font-weight: 400; margin-left: 1px; }
+
+  /* ---- 計算のしかた ---- */
+
+  .dac-method { display: flex; flex-direction: column; gap: 12px; }
+
+  .dac-worked {
+    background: var(--dac-sunk);
+    border: 1px solid var(--dac-line);
+    border-left: 3px solid var(--dac-accent);
+    border-radius: var(--dac-radius);
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .dac-worked-label { font-size: 11px; letter-spacing: .14em; color: var(--dac-soft); }
+  .dac-worked-expr {
+    font-weight: 700;
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 2px;
+  }
+
+  .dac-rules { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
+  .dac-rule {
+    display: grid;
+    grid-template-columns: 6.5em 1fr;
+    gap: 12px;
+    align-items: baseline;
+    padding: 10px 14px 10px 11px;
+    border: 1px solid transparent;
+    border-left: 3px solid var(--dac-line);
+    border-radius: var(--dac-radius);
+    font-size: 14px;
+    color: var(--dac-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .dac-rule[data-active="true"] {
+    background: var(--dac-surface);
+    border-color: var(--dac-line);
+    border-left-color: var(--dac-accent);
+    color: inherit;
+  }
+  .dac-rule dfn { font-style: normal; font-weight: 700; }
+  .dac-rule[data-active="true"] dfn { color: var(--dac-accent); }
+
+  /* ---- 解説 ---- */
+
+  .dac-about {
+    border-top: 1px solid var(--dac-line);
+    padding-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .dac-about section { display: flex; flex-direction: column; gap: 10px; }
+  .dac-about h3 { font-size: 16px; font-weight: 700; margin: 0; line-height: 1.6; }
+  .dac-about p { margin: 0; font-size: 14px; line-height: 1.9; max-width: 34em; }
+
+  .dac-note {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--dac-soft);
+    border-top: 1px solid var(--dac-line);
+    padding-top: 18px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dac *, .dac *::before, .dac *::after { transition: none !important; animation: none !important; }
+  }
+
+  @media (max-width: 600px) {
+    .dac { gap: 26px; }
+    .dac-figure .dac-num { font-size: 58px; }
+    .dac-result { padding: 22px 16px 20px; }
+    .dac-products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .dac-rule { grid-template-columns: 5.5em 1fr; gap: 8px; font-size: 13px; }
+    .dac-row { grid-template-columns: 4.2em 1fr 3.4em; gap: 10px; }
+    .dac-seg-item label { padding: 11px 4px 10px; }
+    .dac-seg-name { font-size: 13px; }
+    .dac-worked-expr { font-size: 16px; }
+  }
+</style>
+
+<div class="dac" id="dac">
+
+  <div class="dac-inputs">
+
+    <div class="dac-field">
+      <div class="dac-field-head">
+        <p class="dac-label" id="dac-age-label">① わんちゃんの年齢</p>
+        <p class="dac-readout dac-serif" aria-hidden="true"><span id="dac-age-out">1</span><span class="dac-u">歳</span><span class="dac-mo" id="dac-age-mo"></span></p>
+      </div>
+      <div class="dac-slider">
+        <input type="range" id="dac-age" min="0" max="20" step="0.25" value="1"
+               aria-labelledby="dac-age-label" aria-valuetext="1歳">
+        <div class="dac-ticks" aria-hidden="true">
+          <span>0</span><span>5</span><span>10</span><span>15</span><span>20</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="dac-field">
+      <p class="dac-label" id="dac-size-label">② わんちゃんのサイズ</p>
+      <div class="dac-seg" role="radiogroup" aria-labelledby="dac-size-label">
+        <div class="dac-seg-item">
+          <input type="radio" name="dac-size" id="dac-size-s" value="small">
+          <label for="dac-size-s">
+            <span class="dac-swatch" aria-hidden="true"></span>
+            <span class="dac-seg-name">小型犬</span>
+            <span class="dac-seg-sub">〜10kg</span>
+          </label>
+        </div>
+        <div class="dac-seg-item">
+          <input type="radio" name="dac-size" id="dac-size-m" value="medium" checked>
+          <label for="dac-size-m">
+            <span class="dac-swatch" aria-hidden="true"></span>
+            <span class="dac-seg-name">中型犬</span>
+            <span class="dac-seg-sub">10〜25kg</span>
+          </label>
+        </div>
+        <div class="dac-seg-item">
+          <input type="radio" name="dac-size" id="dac-size-l" value="large">
+          <label for="dac-size-l">
+            <span class="dac-swatch" aria-hidden="true"></span>
+            <span class="dac-seg-name">大型犬</span>
+            <span class="dac-seg-sub">25kg〜</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="dac-result" aria-live="polite">
+    <p class="dac-result-label">人間年齢の目安</p>
+    <p class="dac-figure dac-serif">
+      <span class="dac-approx">約</span><span class="dac-num" id="dac-human">15</span><span class="dac-unit">歳</span>
+    </p>
+    <p class="dac-stage" id="dac-stage">成犬</p>
+    <p class="dac-stage-note" id="dac-stage-note">体も心も大人になり、いちばん元気に過ごせる時期です。</p>
+  </div>
+
+  <div class="dac-shop" id="dac-shop" hidden>
+    <div class="dac-shop-head">
+      <p class="dac-shop-title" id="dac-shop-title">おすすめ</p>
+      <a class="dac-shop-all" id="dac-shop-all" href="#">すべて見る</a>
+    </div>
+    <ul class="dac-products" id="dac-products"></ul>
+  </div>
+
+  <div class="dac-compare">
+    <div>
+      <p class="dac-label">サイズ別の比較</p>
+      <p class="dac-compare-note">同じ年齢でも、大きい犬ほど人間年齢は上になります。</p>
+    </div>
+    <div class="dac-rows">
+      <div class="dac-row" data-row="small">
+        <span class="dac-row-name">小型犬</span>
+        <span class="dac-track"><span class="dac-fill" data-bar="small" style="width:10%"></span></span>
+        <span class="dac-row-value dac-serif"><span data-val="small">15</span><span class="dac-vu">歳</span></span>
+      </div>
+      <div class="dac-row" data-row="medium">
+        <span class="dac-row-name">中型犬</span>
+        <span class="dac-track"><span class="dac-fill" data-bar="medium" style="width:10%"></span></span>
+        <span class="dac-row-value dac-serif"><span data-val="medium">15</span><span class="dac-vu">歳</span></span>
+      </div>
+      <div class="dac-row" data-row="large">
+        <span class="dac-row-name">大型犬</span>
+        <span class="dac-track"><span class="dac-fill" data-bar="large" style="width:10%"></span></span>
+        <span class="dac-row-value dac-serif"><span data-val="large">15</span><span class="dac-vu">歳</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dac-method">
+    <p class="dac-label">計算のしかた</p>
+    <div class="dac-worked">
+      <span class="dac-worked-label">今回の計算</span>
+      <span class="dac-worked-expr dac-serif" id="dac-worked">1 × 15 ＝ 15</span>
+    </div>
+    <ul class="dac-rules">
+      <li class="dac-rule" id="dac-rule-0"><dfn>1歳まで</dfn><span>年齢 × 15</span></li>
+      <li class="dac-rule" id="dac-rule-1"><dfn>1〜2歳</dfn><span>15 ＋（年齢 − 1）× 9</span></li>
+      <li class="dac-rule" id="dac-rule-2"><dfn>2歳以降</dfn><span>24 ＋（年齢 − 2）× <span id="dac-mult">5</span><span id="dac-mult-note"></span></span></li>
+    </ul>
+  </div>
+
+  <div class="dac-about">
+    <section>
+      <h3>「犬の1年は人の7年」は、なぜ合わないのか</h3>
+      <p>「7倍する」という覚え方は、人の寿命をおよそ70年、犬をおよそ10年として割った大まかな目安です。ただ、1年経った犬はもう体格が大人になり子どもを産むこともできますが、人間の7歳はまだ小学校に入ったばかり。犬の老化は最初に速く、あとからゆるやかになるので、一律に倍率をかける方法では無理が出ます。</p>
+    </section>
+    <section>
+      <h3>最初の2年で、一気に大人になる</h3>
+      <p>そこで時期を3つに分けています。1年目は人間でいう15歳ぶん、2年目は9歳ぶん育ち、ここまでの2年で24歳相当。3年目からはほぼ一定のペースになります。式が「24 ＋（年齢 − 2）× ○」という形なのは、この最初の2年ぶんに、3年目以降を足していく作りだからです。</p>
+    </section>
+    <section>
+      <h3>体が大きいほど、時計が速く進む</h3>
+      <p>3年目以降に足す年数は、小型犬4・中型犬5・大型犬7と変えています。小型犬が15年前後生きることは珍しくありませんが、大型犬では10年前後になることが多いためです。大きく育つぶん細胞分裂の回数が多く、老化や病気のリスクが上がるのではないか、という見方があります。</p>
+    </section>
+  </div>
+
+  <p class="dac-note">この計算は一般的な目安です。犬種や健康状態によって実際の老化の速さは変わります。気になることがあれば、かかりつけの獣医師にご相談ください。</p>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ===========================================================
+  //  ここを書き換えてください
+  //  collection … コレクションのハンドル（URLの末尾）。空にすると非表示。
+  //  title      … 商品欄の見出し
+  // ===========================================================
+  var DAC_CONFIG = {
+    puppy:  { collection: "puppy",  title: "子犬の時期におすすめ" },
+    adult:  { collection: "adult",  title: "成犬の時期におすすめ" },
+    senior: { collection: "senior", title: "シニア期におすすめ" },
+    limit: 3,                 // 出す商品の数
+    currency: "JPY",          // 価格の通貨表示
+    locale: "ja-JP"
+  };
+  // ===========================================================
+
+  var root = document.getElementById("dac");
+  if (!root || root.dataset.ready === "1") { return; }
+  root.dataset.ready = "1";
+
+  // ---- テーマの明暗に合わせて、サイズの色を出し分ける ----------
+  // 濃い緑は暗いテーマの背景に沈むため、暗いテーマでは明るい側の
+  // 3色に入れ替える。どちらの組も、隣り合う色を見分けられること
+  // （色覚特性を含む）と、背景とのコントラストを確認済み。
+  var DARK_RAMP = ["#2F6B4C", "#5CB183", "#9FE9C0"];
+
+  function onDarkBackground(el) {
+    var parts = getComputedStyle(el).color.match(/\d+(?:\.\d+)?/g);
+    if (!parts || parts.length < 3) { return false; }
+    var luminance = (0.2126 * +parts[0] + 0.7152 * +parts[1] + 0.0722 * +parts[2]) / 255;
+    return luminance > 0.5; // 文字色が明るい = 背景が暗い
+  }
+
+  function applyRamp() {
+    var dark = onDarkBackground(root);
+    for (var i = 0; i < 3; i++) {
+      var name = "--dac-size-" + (i + 1);
+      if (dark) { root.style.setProperty(name, DARK_RAMP[i]); }
+      else { root.style.removeProperty(name); }
+    }
+  }
+
+  applyRamp();
+  if (window.matchMedia) {
+    var scheme = window.matchMedia("(prefers-color-scheme: dark)");
+    if (scheme.addEventListener) { scheme.addEventListener("change", applyRamp); }
+  }
+
+  var PER_YEAR   = { small: 4, medium: 5, large: 7 };
+  var SIZE_LABEL = { small: "小型犬", medium: "中型犬", large: "大型犬" };
+  var SIZES      = ["small", "medium", "large"];
+  var BAR_MAX    = 150; // 20歳・大型犬 = 150歳ぶん。全サイズ共通の目盛り。
+
+  var STAGES = [
+    { until: 1,        key: "puppy",  name: "子犬",    note: "体も心も大きく育つ時期。人間でいえば子どもから思春期にあたります。" },
+    { until: 7,        key: "adult",  name: "成犬",    note: "体も心も大人になり、いちばん元気に過ごせる時期です。" },
+    { until: Infinity, key: "senior", name: "シニア犬", note: "少しずつ落ち着いてくる時期。健康診断の回数を増やすと安心です。" }
+  ];
+
+  function humanAge(age, size) {
+    if (age <= 1) { return age * 15; }
+    if (age <= 2) { return 15 + (age - 1) * 9; }
+    return 24 + (age - 2) * PER_YEAR[size];
+  }
+
+  function ruleIndex(age) {
+    if (age <= 1) { return 0; }
+    if (age <= 2) { return 1; }
+    return 2;
+  }
+
+  function stageFor(age) {
+    for (var i = 0; i < STAGES.length; i++) {
+      if (age < STAGES[i].until) { return STAGES[i]; }
+    }
+    return STAGES[STAGES.length - 1];
+  }
+
+  function trim(n) { return String(Math.round(n * 100) / 100); }
+
+  var slider   = document.getElementById("dac-age");
+  var ageOut   = document.getElementById("dac-age-out");
+  var ageMo    = document.getElementById("dac-age-mo");
+  var humanOut = document.getElementById("dac-human");
+  var stageEl  = document.getElementById("dac-stage");
+  var stageNt  = document.getElementById("dac-stage-note");
+  var worked   = document.getElementById("dac-worked");
+  var multEl   = document.getElementById("dac-mult");
+  var multNote = document.getElementById("dac-mult-note");
+
+  var shopBox   = document.getElementById("dac-shop");
+  var shopTitle = document.getElementById("dac-shop-title");
+  var shopAll   = document.getElementById("dac-shop-all");
+  var shopList  = document.getElementById("dac-products");
+
+  // ---- 商品提案 -------------------------------------------------
+
+  var cache        = {};   // ハンドル -> 商品の配列（取得済みのものを使い回す）
+  var currentStage = null; // いま表示しているライフステージ
+
+  var money = new Intl.NumberFormat(DAC_CONFIG.locale, {
+    style: "currency",
+    currency: DAC_CONFIG.currency,
+    maximumFractionDigits: DAC_CONFIG.currency === "JPY" ? 0 : 2
+  });
+
+  // Shopify CDNの画像URLに寸法を差し込んで、軽いサムネイルを読み込む。
+  function thumbUrl(src, size) {
+    if (!src) { return ""; }
+    return src.replace(/(\.(?:png|jpe?g|webp|gif))(\?|$)/i, "_" + size + "x$1$2");
+  }
+
+  function priceOf(product) {
+    var variants = product.variants || [];
+    var lowest = null;
+    var inStock = false;
+    for (var i = 0; i < variants.length; i++) {
+      var value = parseFloat(variants[i].price);
+      if (!isNaN(value) && (lowest === null || value < lowest)) { lowest = value; }
+      if (variants[i].available) { inStock = true; }
+    }
+    return { amount: lowest, inStock: inStock };
+  }
+
+  function renderSkeleton() {
+    shopList.innerHTML = "";
+    for (var i = 0; i < DAC_CONFIG.limit; i++) {
+      var li = document.createElement("li");
+      li.className = "dac-product dac-skeleton";
+      li.innerHTML = '<span class="dac-thumb"></span>';
+      shopList.appendChild(li);
+    }
+  }
+
+  function renderProducts(products) {
+    shopList.innerHTML = "";
+    products.forEach(function (product) {
+      var info  = priceOf(product);
+      var image = (product.images && product.images[0]) ? product.images[0].src : "";
+
+      var li = document.createElement("li");
+      li.className = "dac-product";
+
+      var a = document.createElement("a");
+      a.href = "/products/" + product.handle;
+
+      var thumb = document.createElement("span");
+      thumb.className = "dac-thumb";
+      if (image) {
+        var img = document.createElement("img");
+        img.src = thumbUrl(image, 400);
+        img.alt = product.title;
+        img.loading = "lazy";
+        thumb.appendChild(img);
+      }
+
+      var name = document.createElement("span");
+      name.className = "dac-product-name";
+      name.textContent = product.title;
+
+      var price = document.createElement("span");
+      price.className = "dac-product-price";
+      if (info.amount !== null) {
+        price.textContent = money.format(info.amount);
+      }
+      if (!info.inStock) {
+        var sold = document.createElement("span");
+        sold.className = "dac-product-sold";
+        sold.textContent = info.amount !== null ? "（売り切れ）" : "売り切れ";
+        price.appendChild(sold);
+      }
+
+      a.appendChild(thumb);
+      a.appendChild(name);
+      a.appendChild(price);
+      li.appendChild(a);
+      shopList.appendChild(li);
+    });
+  }
+
+  function loadProducts(handle) {
+    if (cache[handle]) { return Promise.resolve(cache[handle]); }
+    var url = "/collections/" + encodeURIComponent(handle) + "/products.json?limit=" + DAC_CONFIG.limit;
+    return fetch(url, { headers: { "Accept": "application/json" } })
+      .then(function (response) {
+        if (!response.ok) { throw new Error("collection not found: " + handle); }
+        return response.json();
+      })
+      .then(function (data) {
+        var products = (data && data.products) ? data.products.slice(0, DAC_CONFIG.limit) : [];
+        cache[handle] = products;
+        return products;
+      });
+  }
+
+  function updateShop(stage) {
+    if (stage.key === currentStage) { return; }
+    currentStage = stage.key;
+
+    var setting = DAC_CONFIG[stage.key] || {};
+    var handle  = (setting.collection || "").trim();
+
+    // コレクション未設定なら、商品欄はまるごと出さない。
+    if (!handle) {
+      shopBox.hidden = true;
+      return;
+    }
+
+    shopBox.hidden = false;
+    shopTitle.textContent = setting.title || "おすすめ";
+    shopAll.href = "/collections/" + handle;
+    renderSkeleton();
+
+    loadProducts(handle)
+      .then(function (products) {
+        if (currentStage !== stage.key) { return; } // 途中で切り替わっていたら捨てる
+        if (!products.length) { shopBox.hidden = true; return; }
+        renderProducts(products);
+      })
+      .catch(function () {
+        // 取得できなかったときは、商品欄を隠して計算機だけを残す。
+        if (currentStage === stage.key) { shopBox.hidden = true; }
+      });
+  }
+
+  // ---- 描画 -----------------------------------------------------
+
+  function render() {
+    var age    = parseFloat(slider.value);
+    var size   = root.querySelector('input[name="dac-size"]:checked').value;
+    var result = humanAge(age, size);
+    var shown  = Math.round(result);
+
+    ageOut.textContent = trim(age);
+    ageMo.textContent  = age > 0 && age < 1 ? "（約" + Math.round(age * 12) + "か月）" : "";
+    slider.setAttribute("aria-valuetext", trim(age) + "歳、" + SIZE_LABEL[size]);
+
+    humanOut.textContent = String(shown);
+
+    var stage = stageFor(age);
+    stageEl.textContent = stage.name;
+    stageNt.textContent = stage.note;
+
+    var index = ruleIndex(age);
+    if (index === 0) {
+      worked.textContent = trim(age) + " × 15 ＝ " + shown;
+    } else if (index === 1) {
+      worked.textContent = "15 ＋（" + trim(age) + " − 1）× 9 ＝ " + shown;
+    } else {
+      worked.textContent = "24 ＋（" + trim(age) + " − 2）× " + PER_YEAR[size] + " ＝ " + shown;
+    }
+
+    multEl.textContent   = String(PER_YEAR[size]);
+    multNote.textContent = "（" + SIZE_LABEL[size] + "）";
+
+    for (var i = 0; i < 3; i++) {
+      document.getElementById("dac-rule-" + i).setAttribute("data-active", String(i === index));
+    }
+
+    SIZES.forEach(function (key) {
+      var value = humanAge(age, key);
+      root.querySelector('[data-bar="' + key + '"]').style.width =
+        Math.max(value / BAR_MAX * 100, 0) + "%";
+      root.querySelector('[data-val="' + key + '"]').textContent = String(Math.round(value));
+      root.querySelector('[data-row="' + key + '"]').setAttribute("data-active", String(key === size));
+    });
+
+    updateShop(stage);
+  }
+
+  slider.addEventListener("input", render);
+  Array.prototype.forEach.call(root.querySelectorAll('input[name="dac-size"]'), function (radio) {
+    radio.addEventListener("change", render);
+  });
+
+  render();
+})();
+</script>
