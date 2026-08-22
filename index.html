@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>犬の年齢計算</title>
+<meta name="description" content="犬の年齢とサイズから、人間年齢の目安とライフステージを計算します。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@600;700&display=swap">
+<style>
+:root {
+  --ground:      #F2F5EF;
+  --surface:     #FFFFFF;
+  --sunk:        #E8EDE5;
+  --line:        #D5DDD1;
+  --line-strong: #BDC8B9;
+  --ink:         #16211B;
+  --ink-soft:    #5A6961;
+  --ink-faint:   #8B978F;
+  --amber:       #9A6216;
+  --amber-sunk:  #F0E4D2;
+  --size-1:      #6FAF8C;
+  --size-2:      #358055;
+  --size-3:      #14472F;
+  --shadow: 0 1px 2px rgba(22,33,27,.05), 0 10px 30px -18px rgba(22,33,27,.35);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:      #0E1411;
+    --surface:     #171F1A;
+    --sunk:        #121815;
+    --line:        #283329;
+    --line-strong: #3A4A3D;
+    --ink:         #E6EDE7;
+    --ink-soft:    #97A59C;
+    --ink-faint:   #6C7A72;
+    --amber:       #D9A24F;
+    --amber-sunk:  #2E2517;
+    --size-1:      #2F6B4C;
+    --size-2:      #5CB183;
+    --size-3:      #9FE9C0;
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 30px -18px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"] {
+  --ground:      #0E1411;
+  --surface:     #171F1A;
+  --sunk:        #121815;
+  --line:        #283329;
+  --line-strong: #3A4A3D;
+  --ink:         #E6EDE7;
+  --ink-soft:    #97A59C;
+  --ink-faint:   #6C7A72;
+  --amber:       #D9A24F;
+  --amber-sunk:  #2E2517;
+  --size-1:      #2F6B4C;
+  --size-2:      #5CB183;
+  --size-3:      #9FE9C0;
+  --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 30px -18px rgba(0,0,0,.8);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: "Zen Kaku Gothic New", system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 56px 24px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ---- header ---- */
+
+.masthead { display: flex; flex-direction: column; gap: 10px; }
+
+h1 {
+  font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 1.3;
+  letter-spacing: .02em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.lede {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 15px;
+  max-width: 34em;
+}
+
+/* ---- shared field chrome ---- */
+
+.field { display: flex; flex-direction: column; gap: 14px; }
+
+.field-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.readout {
+  font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-weight: 700;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .01em;
+}
+.readout .unit { font-size: 14px; color: var(--ink-soft); margin-left: 2px; }
+.readout .months { font-size: 13px; color: var(--ink-faint); font-family: inherit; margin-left: 6px; }
+
+/* ---- age slider ---- */
+
+.slider-wrap { display: flex; flex-direction: column; gap: 8px; }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--sunk);
+  border: 1px solid var(--line);
+}
+input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--sunk);
+  border: 1px solid var(--line);
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -9px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 3px solid var(--amber);
+  box-shadow: var(--shadow);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 3px solid var(--amber);
+  box-shadow: var(--shadow);
+}
+input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--amber); outline-offset: 3px; }
+input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+.ticks {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 9px; /* スライダーつまみの可動域に合わせる */
+  font-size: 11px;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .04em;
+}
+
+/* ---- result plate ---- */
+
+.result {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  box-shadow: var(--shadow);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  text-align: center;
+}
+
+.result-label {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  color: var(--ink-faint);
+}
+
+.result-figure {
+  font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1;
+  margin: 6px 0 2px;
+}
+.result-figure .approx { font-size: 20px; color: var(--ink-soft); }
+.result-figure .num {
+  font-size: 76px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.01em;
+}
+.result-figure .unit { font-size: 24px; color: var(--ink-soft); }
+
+.stage {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 13px 5px 10px;
+  border-radius: 2px;
+  background: var(--amber-sunk);
+  color: var(--amber);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  margin-top: 10px;
+}
+.stage::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.stage-note {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 8px 0 0;
+  max-width: 30em;
+}
+
+/* ---- size comparison / selector ---- */
+
+.compare { display: flex; flex-direction: column; gap: 14px; }
+
+.compare-head { display: flex; flex-direction: column; gap: 2px; }
+.compare-note { font-size: 13px; color: var(--ink-faint); margin: 0; }
+
+.rows { display: flex; flex-direction: column; gap: 2px; }
+
+.row { position: relative; }
+
+.row input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.row label {
+  display: grid;
+  grid-template-columns: 4.5em 1fr 3.6em;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px 13px 13px;
+  border: 1px solid transparent;
+  border-left: 3px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  background: transparent;
+}
+.row label:hover { background: var(--sunk); }
+.row input:checked + label {
+  background: var(--surface);
+  border-color: var(--line);
+  border-left-color: var(--amber);
+  box-shadow: var(--shadow);
+}
+.row input:focus-visible + label { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+.row-name { font-size: 14px; font-weight: 500; }
+.row input:checked + label .row-name { font-weight: 700; }
+
+.bar-track {
+  display: block;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--sunk);
+  overflow: hidden;
+}
+.bar-fill {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  transition: width .28s cubic-bezier(.22,.61,.36,1);
+}
+.row:nth-child(1) .bar-fill { background: var(--size-1); }
+.row:nth-child(2) .bar-fill { background: var(--size-2); }
+.row:nth-child(3) .bar-fill { background: var(--size-3); }
+
+.row-value {
+  font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-weight: 700;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--ink-soft);
+}
+.row input:checked + label .row-value { color: var(--ink); }
+.row-value .u { font-size: 12px; font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 400; margin-left: 1px; }
+
+/* ---- footnotes ---- */
+
+.notes {
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.disclaimer { margin: 0; font-size: 13px; color: var(--ink-soft); }
+
+details { font-size: 13px; color: var(--ink-soft); }
+summary {
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: .03em;
+  padding: 2px 0;
+}
+summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; border-radius: 2px; }
+.formula {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-variant-numeric: tabular-nums;
+}
+.formula li {
+  display: grid;
+  grid-template-columns: 6.5em 1fr;
+  gap: 10px;
+  padding-left: 12px;
+  border-left: 1px solid var(--line-strong);
+}
+.formula dfn { font-style: normal; font-weight: 500; color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+@media (max-width: 420px) {
+  .page { padding: 40px 18px 56px; gap: 32px; }
+  h1 { font-size: 28px; }
+  .result-figure .num { font-size: 62px; }
+  .row label { grid-template-columns: 4.2em 1fr 3.4em; gap: 10px; padding-left: 10px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+  <header class="masthead">
+    <h1>犬の年齢を、人間の年齢に。</h1>
+    <p class="lede">年齢とサイズを選ぶと、人間年齢の目安とライフステージが分かります。体が大きい犬ほど、歳の重ね方は速くなります。</p>
+  </header>
+
+  <section class="field" aria-labelledby="age-label">
+    <div class="field-head">
+      <p class="label" id="age-label">わんちゃんの年齢</p>
+      <p class="readout" aria-hidden="true"><span id="age-out">1</span><span class="unit">歳</span><span class="months" id="age-months"></span></p>
+    </div>
+    <div class="slider-wrap">
+      <input type="range" id="age" min="0" max="20" step="0.25" value="1"
+             aria-labelledby="age-label" aria-valuetext="1歳">
+      <div class="ticks" aria-hidden="true">
+        <span>0</span><span>5</span><span>10</span><span>15</span><span>20</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="result" aria-live="polite">
+    <p class="result-label">人間年齢の目安</p>
+    <p class="result-figure">
+      <span class="approx">約</span><span class="num" id="human-age">15</span><span class="unit">歳</span>
+    </p>
+    <p class="stage" id="stage">成犬</p>
+    <p class="stage-note" id="stage-note">体も心も大人になり、いちばん元気に過ごせる時期です。</p>
+  </section>
+
+  <section class="compare">
+    <div class="compare-head">
+      <p class="label">サイズ別の比較</p>
+      <p class="compare-note">タップすると、そのサイズで計算します。</p>
+    </div>
+    <div class="rows" role="radiogroup" aria-label="犬のサイズ">
+
+      <div class="row">
+        <input type="radio" name="size" id="size-s" value="small">
+        <label for="size-s">
+          <span class="row-name">小型犬</span>
+          <span class="bar-track"><span class="bar-fill" data-bar="small" style="width:10%"></span></span>
+          <span class="row-value"><span data-val="small">15</span><span class="u">歳</span></span>
+        </label>
+      </div>
+
+      <div class="row">
+        <input type="radio" name="size" id="size-m" value="medium" checked>
+        <label for="size-m">
+          <span class="row-name">中型犬</span>
+          <span class="bar-track"><span class="bar-fill" data-bar="medium" style="width:10%"></span></span>
+          <span class="row-value"><span data-val="medium">15</span><span class="u">歳</span></span>
+        </label>
+      </div>
+
+      <div class="row">
+        <input type="radio" name="size" id="size-l" value="large">
+        <label for="size-l">
+          <span class="row-name">大型犬</span>
+          <span class="bar-track"><span class="bar-fill" data-bar="large" style="width:10%"></span></span>
+          <span class="row-value"><span data-val="large">15</span><span class="u">歳</span></span>
+        </label>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="notes">
+    <p class="disclaimer">この計算は一般的な目安です。犬種や健康状態によって実際の老化の速さは変わります。気になることがあれば、かかりつけの獣医師にご相談ください。</p>
+    <details>
+      <summary>計算式について</summary>
+      <ul class="formula">
+        <li><dfn>1歳まで</dfn><span>年齢 × 15</span></li>
+        <li><dfn>1〜2歳</dfn><span>15 + (年齢 − 1) × 9</span></li>
+        <li><dfn>2歳以降</dfn><span>24 + (年齢 − 2) × 4（小型）／ 5（中型）／ 7（大型）</span></li>
+      </ul>
+    </details>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var PER_YEAR = { small: 4, medium: 5, large: 7 };
+  var SIZE_LABEL = { small: "小型犬", medium: "中型犬", large: "大型犬" };
+  var BAR_MAX = 150; // 20歳・大型犬 = 150歳ぶん。全サイズ共通の目盛り。
+
+  var STAGES = [
+    { until: 1,        name: "子犬",   note: "体も心も大きく育つ時期。人間でいえば子どもから思春期にあたります。" },
+    { until: 7,        name: "成犬",   note: "体も心も大人になり、いちばん元気に過ごせる時期です。" },
+    { until: Infinity, name: "シニア犬", note: "少しずつ落ち着いてくる時期。健康診断の回数を増やすと安心です。" }
+  ];
+
+  function humanAge(age, size) {
+    if (age <= 1) return age * 15;
+    if (age <= 2) return 15 + (age - 1) * 9;
+    return 24 + (age - 2) * PER_YEAR[size];
+  }
+
+  function stageFor(age) {
+    for (var i = 0; i < STAGES.length; i++) {
+      if (age < STAGES[i].until) return STAGES[i];
+    }
+    return STAGES[STAGES.length - 1];
+  }
+
+  var slider    = document.getElementById("age");
+  var ageOut    = document.getElementById("age-out");
+  var ageMonths = document.getElementById("age-months");
+  var humanOut  = document.getElementById("human-age");
+  var stageEl   = document.getElementById("stage");
+  var stageNote = document.getElementById("stage-note");
+
+  function render() {
+    var age  = parseFloat(slider.value);
+    var size = document.querySelector('input[name="size"]:checked').value;
+
+    // 年齢の表示。1歳未満は月齢を添える。
+    ageOut.textContent = Number.isInteger(age) ? String(age) : age.toFixed(2).replace(/0$/, "");
+    ageMonths.textContent = age > 0 && age < 1 ? "（約" + Math.round(age * 12) + "か月）" : "";
+    slider.setAttribute("aria-valuetext", ageOut.textContent + "歳、" + SIZE_LABEL[size]);
+
+    humanOut.textContent = String(Math.round(humanAge(age, size)));
+
+    var stage = stageFor(age);
+    stageEl.textContent = stage.name;
+    stageNote.textContent = stage.note;
+
+    Object.keys(PER_YEAR).forEach(function (key) {
+      var value = humanAge(age, key);
+      document.querySelector('[data-bar="' + key + '"]').style.width =
+        Math.max(value / BAR_MAX * 100, 0) + "%";
+      document.querySelector('[data-val="' + key + '"]').textContent = String(Math.round(value));
+    });
+  }
+
+  slider.addEventListener("input", render);
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="size"]'), function (radio) {
+    radio.addEventListener("change", render);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
