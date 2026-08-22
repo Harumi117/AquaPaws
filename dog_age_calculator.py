@@ -40,5 +40,20 @@ if st.button("人間年齢に換算する"):
         stage = "シニア犬"
     st.write(f"ライフステージの目安: {stage}")
 
+    # 今回あてはまる式に、実際の数字を入れて表示する
+    st.subheader("計算のしかた")
+    if age <= 1:
+        st.write(f"今回の計算: {age:g} × 15 ＝ {human_age:.0f}")
+    elif age <= 2:
+        st.write(f"今回の計算: 15 ＋ ({age:g} − 1) × 9 ＝ {human_age:.0f}")
+    else:
+        st.write(
+            f"今回の計算: 24 ＋ ({age:g} − 2) × "
+            f"{YEARS_PER_ADDITIONAL_YEAR[size]} ＝ {human_age:.0f}"
+        )
+    st.write("- 1歳まで：年齢 × 15")
+    st.write("- 1〜2歳：15 ＋ (年齢 − 1) × 9")
+    st.write("- 2歳以降：24 ＋ (年齢 − 2) × 4（小型）／ 5（中型）／ 7（大型）")
+
 # 補足情報
 st.info("※ この計算は一般的な目安です。犬種や個体差により実際の成長速度は異なります。")

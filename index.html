@@ -78,12 +78,8 @@ body {
   padding: 56px 24px 72px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 38px;
 }
-
-/* ---- header ---- */
-
-.masthead { display: flex; flex-direction: column; gap: 10px; }
 
 h1 {
   font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
@@ -91,7 +87,7 @@ h1 {
   font-size: 34px;
   line-height: 1.3;
   letter-spacing: .02em;
-  margin: 0;
+  margin: 0 0 10px;
   text-wrap: balance;
 }
 
@@ -102,7 +98,17 @@ h1 {
   max-width: 34em;
 }
 
-/* ---- shared field chrome ---- */
+.label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* ---- inputs ---- */
+
+.inputs { display: flex; flex-direction: column; gap: 30px; }
 
 .field { display: flex; flex-direction: column; gap: 14px; }
 
@@ -113,25 +119,15 @@ h1 {
   gap: 16px;
 }
 
-.label {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  color: var(--ink-soft);
-  margin: 0;
-}
-
 .readout {
   font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
   font-weight: 700;
   font-size: 22px;
   font-variant-numeric: tabular-nums;
-  letter-spacing: .01em;
+  margin: 0;
 }
 .readout .unit { font-size: 14px; color: var(--ink-soft); margin-left: 2px; }
-.readout .months { font-size: 13px; color: var(--ink-faint); font-family: inherit; margin-left: 6px; }
-
-/* ---- age slider ---- */
+.readout .months { font-size: 13px; color: var(--ink-faint); font-family: inherit; font-weight: 400; margin-left: 6px; }
 
 .slider-wrap { display: flex; flex-direction: column; gap: 8px; }
 
@@ -145,34 +141,24 @@ input[type="range"] {
   cursor: pointer;
 }
 input[type="range"]::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--sunk);
-  border: 1px solid var(--line);
+  height: 6px; border-radius: 3px;
+  background: var(--sunk); border: 1px solid var(--line);
 }
 input[type="range"]::-moz-range-track {
-  height: 6px;
-  border-radius: 3px;
-  background: var(--sunk);
-  border: 1px solid var(--line);
+  height: 6px; border-radius: 3px;
+  background: var(--sunk); border: 1px solid var(--line);
 }
 input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 22px;
-  height: 22px;
-  margin-top: -9px;
+  -webkit-appearance: none; appearance: none;
+  width: 22px; height: 22px; margin-top: -9px;
   border-radius: 50%;
-  background: var(--surface);
-  border: 3px solid var(--amber);
+  background: var(--surface); border: 3px solid var(--amber);
   box-shadow: var(--shadow);
 }
 input[type="range"]::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
+  width: 22px; height: 22px;
   border-radius: 50%;
-  background: var(--surface);
-  border: 3px solid var(--amber);
+  background: var(--surface); border: 3px solid var(--amber);
   box-shadow: var(--shadow);
 }
 input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--amber); outline-offset: 3px; }
@@ -188,6 +174,54 @@ input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--a
   letter-spacing: .04em;
 }
 
+/* ---- size selector (segmented) ---- */
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.seg { position: relative; display: flex; }
+.seg input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.seg label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 13px 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--sunk);
+  cursor: pointer;
+  text-align: center;
+  transition: background .15s ease, border-color .15s ease;
+}
+.seg label:hover { border-color: var(--line-strong); }
+.seg input:checked + label {
+  background: var(--surface);
+  border-color: var(--amber);
+  box-shadow: var(--shadow);
+}
+.seg input:focus-visible + label { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+.seg-swatch {
+  width: 100%;
+  max-width: 34px;
+  height: 4px;
+  border-radius: 2px;
+  margin-bottom: 6px;
+}
+.seg:nth-child(1) .seg-swatch { background: var(--size-1); }
+.seg:nth-child(2) .seg-swatch { background: var(--size-2); }
+.seg:nth-child(3) .seg-swatch { background: var(--size-3); }
+
+.seg-name { font-size: 14px; font-weight: 500; line-height: 1.4; }
+.seg input:checked + label .seg-name { font-weight: 700; }
+.seg-sub { font-size: 11px; color: var(--ink-faint); font-variant-numeric: tabular-nums; line-height: 1.4; }
+
 /* ---- result plate ---- */
 
 .result {
@@ -195,10 +229,9 @@ input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--a
   border: 1px solid var(--line);
   border-radius: 3px;
   box-shadow: var(--shadow);
-  padding: 32px 28px;
+  padding: 30px 28px 28px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
   align-items: center;
   text-align: center;
 }
@@ -208,6 +241,7 @@ input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--a
   font-weight: 500;
   letter-spacing: .18em;
   color: var(--ink-faint);
+  margin: 0;
 }
 
 .result-figure {
@@ -217,14 +251,10 @@ input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--a
   align-items: baseline;
   gap: 6px;
   line-height: 1;
-  margin: 6px 0 2px;
+  margin: 12px 0 0;
 }
 .result-figure .approx { font-size: 20px; color: var(--ink-soft); }
-.result-figure .num {
-  font-size: 76px;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -.01em;
-}
+.result-figure .num { font-size: 76px; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
 .result-figure .unit { font-size: 24px; color: var(--ink-soft); }
 
 .stage {
@@ -238,64 +268,93 @@ input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--a
   font-size: 13px;
   font-weight: 700;
   letter-spacing: .06em;
-  margin-top: 10px;
+  margin: 14px 0 0;
 }
 .stage::before {
   content: "";
-  width: 7px;
-  height: 7px;
+  width: 7px; height: 7px;
   border-radius: 50%;
   background: currentColor;
 }
 
-.stage-note {
-  font-size: 13px;
-  color: var(--ink-soft);
-  margin: 8px 0 0;
-  max-width: 30em;
+.stage-note { font-size: 13px; color: var(--ink-soft); margin: 10px 0 0; max-width: 30em; }
+
+/* ---- how it's calculated ---- */
+
+.method { display: flex; flex-direction: column; gap: 14px; }
+
+.worked {
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--amber);
+  border-radius: 2px;
+  padding: 15px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.worked-label { font-size: 11px; letter-spacing: .14em; color: var(--ink-faint); }
+.worked-expr {
+  font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  font-weight: 700;
+  font-size: 19px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 2px;
 }
 
-/* ---- size comparison / selector ---- */
+.rules { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 2px; }
 
-.compare { display: flex; flex-direction: column; gap: 14px; }
+.rule {
+  display: grid;
+  grid-template-columns: 6.5em 1fr;
+  gap: 12px;
+  align-items: baseline;
+  padding: 11px 14px 11px 11px;
+  border: 1px solid transparent;
+  border-left: 3px solid var(--line-strong);
+  border-radius: 2px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.rule[data-active="true"] {
+  background: var(--surface);
+  border-color: var(--line);
+  border-left-color: var(--amber);
+  color: var(--ink);
+}
+.rule dfn { font-style: normal; font-weight: 700; color: var(--ink); }
+.rule[data-active="true"] dfn { color: var(--amber); }
+.rule-expr { overflow-x: auto; }
 
-.compare-head { display: flex; flex-direction: column; gap: 2px; }
-.compare-note { font-size: 13px; color: var(--ink-faint); margin: 0; }
+/* ---- size comparison ---- */
+
+.compare { display: flex; flex-direction: column; gap: 12px; }
+.compare-note { font-size: 13px; color: var(--ink-faint); margin: 2px 0 0; }
 
 .rows { display: flex; flex-direction: column; gap: 2px; }
 
-.row { position: relative; }
-
-.row input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.row label {
+.crow {
   display: grid;
   grid-template-columns: 4.5em 1fr 3.6em;
   align-items: center;
   gap: 14px;
-  padding: 13px 16px 13px 13px;
+  padding: 11px 14px 11px 11px;
   border: 1px solid transparent;
   border-left: 3px solid transparent;
   border-radius: 2px;
-  cursor: pointer;
-  background: transparent;
 }
-.row label:hover { background: var(--sunk); }
-.row input:checked + label {
+.crow[data-active="true"] {
   background: var(--surface);
   border-color: var(--line);
   border-left-color: var(--amber);
-  box-shadow: var(--shadow);
 }
-.row input:focus-visible + label { outline: 2px solid var(--amber); outline-offset: 2px; }
 
-.row-name { font-size: 14px; font-weight: 500; }
-.row input:checked + label .row-name { font-weight: 700; }
+.crow-name { font-size: 14px; }
+.crow[data-active="true"] .crow-name { font-weight: 700; }
 
 .bar-track {
   display: block;
@@ -311,11 +370,11 @@ input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--a
   border-radius: 0 4px 4px 0;
   transition: width .28s cubic-bezier(.22,.61,.36,1);
 }
-.row:nth-child(1) .bar-fill { background: var(--size-1); }
-.row:nth-child(2) .bar-fill { background: var(--size-2); }
-.row:nth-child(3) .bar-fill { background: var(--size-3); }
+.crow:nth-child(1) .bar-fill { background: var(--size-1); }
+.crow:nth-child(2) .bar-fill { background: var(--size-2); }
+.crow:nth-child(3) .bar-fill { background: var(--size-3); }
 
-.row-value {
+.crow-value {
   font-family: "Zen Old Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
   font-weight: 700;
   font-size: 17px;
@@ -323,80 +382,94 @@ input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--a
   text-align: right;
   color: var(--ink-soft);
 }
-.row input:checked + label .row-value { color: var(--ink); }
-.row-value .u { font-size: 12px; font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 400; margin-left: 1px; }
+.crow[data-active="true"] .crow-value { color: var(--ink); }
+.crow-value .u { font-size: 12px; font-family: "Zen Kaku Gothic New", sans-serif; font-weight: 400; margin-left: 1px; }
 
-/* ---- footnotes ---- */
+/* ---- footer ---- */
 
-.notes {
+.disclaimer {
   border-top: 1px solid var(--line);
   padding-top: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
 }
-
-.disclaimer { margin: 0; font-size: 13px; color: var(--ink-soft); }
-
-details { font-size: 13px; color: var(--ink-soft); }
-summary {
-  cursor: pointer;
-  font-weight: 500;
-  color: var(--ink);
-  letter-spacing: .03em;
-  padding: 2px 0;
-}
-summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; border-radius: 2px; }
-.formula {
-  margin: 12px 0 0;
-  padding: 0;
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  font-variant-numeric: tabular-nums;
-}
-.formula li {
-  display: grid;
-  grid-template-columns: 6.5em 1fr;
-  gap: 10px;
-  padding-left: 12px;
-  border-left: 1px solid var(--line-strong);
-}
-.formula dfn { font-style: normal; font-weight: 500; color: var(--ink); }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
 
 @media (max-width: 420px) {
-  .page { padding: 40px 18px 56px; gap: 32px; }
+  .page { padding: 40px 18px 56px; gap: 30px; }
   h1 { font-size: 28px; }
   .result-figure .num { font-size: 62px; }
-  .row label { grid-template-columns: 4.2em 1fr 3.4em; gap: 10px; padding-left: 10px; }
+  .result { padding: 26px 18px 24px; }
+  .worked-expr { font-size: 16px; }
+  .rule { grid-template-columns: 5.5em 1fr; gap: 8px; font-size: 13px; }
+  .crow { grid-template-columns: 4.2em 1fr 3.4em; gap: 10px; }
+  .seg label { padding: 11px 4px 10px; }
+  .seg-name { font-size: 13px; }
 }
 </style>
 </head>
 <body>
 <main class="page">
 
-  <header class="masthead">
+  <header>
     <h1>犬の年齢を、人間の年齢に。</h1>
     <p class="lede">年齢とサイズを選ぶと、人間年齢の目安とライフステージが分かります。体が大きい犬ほど、歳の重ね方は速くなります。</p>
   </header>
 
-  <section class="field" aria-labelledby="age-label">
-    <div class="field-head">
-      <p class="label" id="age-label">わんちゃんの年齢</p>
-      <p class="readout" aria-hidden="true"><span id="age-out">1</span><span class="unit">歳</span><span class="months" id="age-months"></span></p>
-    </div>
-    <div class="slider-wrap">
-      <input type="range" id="age" min="0" max="20" step="0.25" value="1"
-             aria-labelledby="age-label" aria-valuetext="1歳">
-      <div class="ticks" aria-hidden="true">
-        <span>0</span><span>5</span><span>10</span><span>15</span><span>20</span>
+  <section class="inputs">
+
+    <div class="field">
+      <div class="field-head">
+        <p class="label" id="age-label">① わんちゃんの年齢</p>
+        <p class="readout" aria-hidden="true"><span id="age-out">1</span><span class="unit">歳</span><span class="months" id="age-months"></span></p>
+      </div>
+      <div class="slider-wrap">
+        <input type="range" id="age" min="0" max="20" step="0.25" value="1"
+               aria-labelledby="age-label" aria-valuetext="1歳">
+        <div class="ticks" aria-hidden="true">
+          <span>0</span><span>5</span><span>10</span><span>15</span><span>20</span>
+        </div>
       </div>
     </div>
+
+    <div class="field">
+      <p class="label" id="size-label">② わんちゃんのサイズ</p>
+      <div class="segmented" role="radiogroup" aria-labelledby="size-label">
+
+        <div class="seg">
+          <input type="radio" name="size" id="size-s" value="small">
+          <label for="size-s">
+            <span class="seg-swatch" aria-hidden="true"></span>
+            <span class="seg-name">小型犬</span>
+            <span class="seg-sub">〜10kg</span>
+          </label>
+        </div>
+
+        <div class="seg">
+          <input type="radio" name="size" id="size-m" value="medium" checked>
+          <label for="size-m">
+            <span class="seg-swatch" aria-hidden="true"></span>
+            <span class="seg-name">中型犬</span>
+            <span class="seg-sub">10〜25kg</span>
+          </label>
+        </div>
+
+        <div class="seg">
+          <input type="radio" name="size" id="size-l" value="large">
+          <label for="size-l">
+            <span class="seg-swatch" aria-hidden="true"></span>
+            <span class="seg-name">大型犬</span>
+            <span class="seg-sub">25kg〜</span>
+          </label>
+        </div>
+
+      </div>
+    </div>
+
   </section>
 
   <section class="result" aria-live="polite">
@@ -408,54 +481,50 @@ summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; bo
     <p class="stage-note" id="stage-note">体も心も大人になり、いちばん元気に過ごせる時期です。</p>
   </section>
 
+  <section class="method">
+    <p class="label">計算のしかた</p>
+
+    <div class="worked">
+      <span class="worked-label">今回の計算</span>
+      <span class="worked-expr" id="worked">1 × 15 ＝ 15</span>
+    </div>
+
+    <ul class="rules">
+      <li class="rule" id="rule-0"><dfn>1歳まで</dfn><span class="rule-expr">年齢 × 15</span></li>
+      <li class="rule" id="rule-1"><dfn>1〜2歳</dfn><span class="rule-expr">15 ＋（年齢 − 1）× 9</span></li>
+      <li class="rule" id="rule-2"><dfn>2歳以降</dfn><span class="rule-expr">24 ＋（年齢 − 2）× <span id="rule-mult">5</span><span id="rule-mult-note"></span></span></li>
+    </ul>
+  </section>
+
   <section class="compare">
-    <div class="compare-head">
+    <div>
       <p class="label">サイズ別の比較</p>
-      <p class="compare-note">タップすると、そのサイズで計算します。</p>
+      <p class="compare-note">同じ年齢でも、大きい犬ほど人間年齢は上になります。</p>
     </div>
-    <div class="rows" role="radiogroup" aria-label="犬のサイズ">
+    <div class="rows">
 
-      <div class="row">
-        <input type="radio" name="size" id="size-s" value="small">
-        <label for="size-s">
-          <span class="row-name">小型犬</span>
-          <span class="bar-track"><span class="bar-fill" data-bar="small" style="width:10%"></span></span>
-          <span class="row-value"><span data-val="small">15</span><span class="u">歳</span></span>
-        </label>
+      <div class="crow" data-row="small">
+        <span class="crow-name">小型犬</span>
+        <span class="bar-track"><span class="bar-fill" data-bar="small" style="width:10%"></span></span>
+        <span class="crow-value"><span data-val="small">15</span><span class="u">歳</span></span>
       </div>
 
-      <div class="row">
-        <input type="radio" name="size" id="size-m" value="medium" checked>
-        <label for="size-m">
-          <span class="row-name">中型犬</span>
-          <span class="bar-track"><span class="bar-fill" data-bar="medium" style="width:10%"></span></span>
-          <span class="row-value"><span data-val="medium">15</span><span class="u">歳</span></span>
-        </label>
+      <div class="crow" data-row="medium">
+        <span class="crow-name">中型犬</span>
+        <span class="bar-track"><span class="bar-fill" data-bar="medium" style="width:10%"></span></span>
+        <span class="crow-value"><span data-val="medium">15</span><span class="u">歳</span></span>
       </div>
 
-      <div class="row">
-        <input type="radio" name="size" id="size-l" value="large">
-        <label for="size-l">
-          <span class="row-name">大型犬</span>
-          <span class="bar-track"><span class="bar-fill" data-bar="large" style="width:10%"></span></span>
-          <span class="row-value"><span data-val="large">15</span><span class="u">歳</span></span>
-        </label>
+      <div class="crow" data-row="large">
+        <span class="crow-name">大型犬</span>
+        <span class="bar-track"><span class="bar-fill" data-bar="large" style="width:10%"></span></span>
+        <span class="crow-value"><span data-val="large">15</span><span class="u">歳</span></span>
       </div>
 
     </div>
   </section>
 
-  <section class="notes">
-    <p class="disclaimer">この計算は一般的な目安です。犬種や健康状態によって実際の老化の速さは変わります。気になることがあれば、かかりつけの獣医師にご相談ください。</p>
-    <details>
-      <summary>計算式について</summary>
-      <ul class="formula">
-        <li><dfn>1歳まで</dfn><span>年齢 × 15</span></li>
-        <li><dfn>1〜2歳</dfn><span>15 + (年齢 − 1) × 9</span></li>
-        <li><dfn>2歳以降</dfn><span>24 + (年齢 − 2) × 4（小型）／ 5（中型）／ 7（大型）</span></li>
-      </ul>
-    </details>
-  </section>
+  <p class="disclaimer">この計算は一般的な目安です。犬種や健康状態によって実際の老化の速さは変わります。気になることがあれば、かかりつけの獣医師にご相談ください。</p>
 
 </main>
 
@@ -463,13 +532,14 @@ summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; bo
 (function () {
   "use strict";
 
-  var PER_YEAR = { small: 4, medium: 5, large: 7 };
+  var PER_YEAR   = { small: 4, medium: 5, large: 7 };
   var SIZE_LABEL = { small: "小型犬", medium: "中型犬", large: "大型犬" };
-  var BAR_MAX = 150; // 20歳・大型犬 = 150歳ぶん。全サイズ共通の目盛り。
+  var SIZES      = ["small", "medium", "large"];
+  var BAR_MAX    = 150; // 20歳・大型犬 = 150歳ぶん。全サイズ共通の目盛り。
 
   var STAGES = [
-    { until: 1,        name: "子犬",   note: "体も心も大きく育つ時期。人間でいえば子どもから思春期にあたります。" },
-    { until: 7,        name: "成犬",   note: "体も心も大人になり、いちばん元気に過ごせる時期です。" },
+    { until: 1,        name: "子犬",    note: "体も心も大きく育つ時期。人間でいえば子どもから思春期にあたります。" },
+    { until: 7,        name: "成犬",    note: "体も心も大人になり、いちばん元気に過ごせる時期です。" },
     { until: Infinity, name: "シニア犬", note: "少しずつ落ち着いてくる時期。健康診断の回数を増やすと安心です。" }
   ];
 
@@ -479,11 +549,23 @@ summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; bo
     return 24 + (age - 2) * PER_YEAR[size];
   }
 
+  // 適用される計算式が3つのうちどれかを返す。
+  function ruleIndex(age) {
+    if (age <= 1) return 0;
+    if (age <= 2) return 1;
+    return 2;
+  }
+
   function stageFor(age) {
     for (var i = 0; i < STAGES.length; i++) {
       if (age < STAGES[i].until) return STAGES[i];
     }
     return STAGES[STAGES.length - 1];
+  }
+
+  // 末尾の余分な0を落として表示する（5 → "5"、0.5 → "0.5"）。
+  function trim(n) {
+    return String(Math.round(n * 100) / 100);
   }
 
   var slider    = document.getElementById("age");
@@ -492,27 +574,49 @@ summary:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; bo
   var humanOut  = document.getElementById("human-age");
   var stageEl   = document.getElementById("stage");
   var stageNote = document.getElementById("stage-note");
+  var worked    = document.getElementById("worked");
+  var ruleMult  = document.getElementById("rule-mult");
+  var ruleNote  = document.getElementById("rule-mult-note");
 
   function render() {
-    var age  = parseFloat(slider.value);
-    var size = document.querySelector('input[name="size"]:checked').value;
+    var age    = parseFloat(slider.value);
+    var size   = document.querySelector('input[name="size"]:checked').value;
+    var result = humanAge(age, size);
+    var shown  = Math.round(result);
 
-    // 年齢の表示。1歳未満は月齢を添える。
-    ageOut.textContent = Number.isInteger(age) ? String(age) : age.toFixed(2).replace(/0$/, "");
+    ageOut.textContent = trim(age);
     ageMonths.textContent = age > 0 && age < 1 ? "（約" + Math.round(age * 12) + "か月）" : "";
-    slider.setAttribute("aria-valuetext", ageOut.textContent + "歳、" + SIZE_LABEL[size]);
+    slider.setAttribute("aria-valuetext", trim(age) + "歳、" + SIZE_LABEL[size]);
 
-    humanOut.textContent = String(Math.round(humanAge(age, size)));
+    humanOut.textContent = String(shown);
 
     var stage = stageFor(age);
     stageEl.textContent = stage.name;
     stageNote.textContent = stage.note;
 
-    Object.keys(PER_YEAR).forEach(function (key) {
+    // 今回あてはまる式に、実際の数字を入れて表示する。
+    var index = ruleIndex(age);
+    if (index === 0) {
+      worked.textContent = trim(age) + " × 15 ＝ " + shown;
+    } else if (index === 1) {
+      worked.textContent = "15 ＋（" + trim(age) + " − 1）× 9 ＝ " + shown;
+    } else {
+      worked.textContent = "24 ＋（" + trim(age) + " − 2）× " + PER_YEAR[size] + " ＝ " + shown;
+    }
+
+    ruleMult.textContent = String(PER_YEAR[size]);
+    ruleNote.textContent = "（" + SIZE_LABEL[size] + "）";
+
+    for (var i = 0; i < 3; i++) {
+      document.getElementById("rule-" + i).setAttribute("data-active", String(i === index));
+    }
+
+    SIZES.forEach(function (key) {
       var value = humanAge(age, key);
       document.querySelector('[data-bar="' + key + '"]').style.width =
         Math.max(value / BAR_MAX * 100, 0) + "%";
       document.querySelector('[data-val="' + key + '"]').textContent = String(Math.round(value));
+      document.querySelector('[data-row="' + key + '"]').setAttribute("data-active", String(key === size));
     });
   }
 
